@@ -14,7 +14,6 @@ namespace SmartInvoicePrintingTool.Services.Implementations;
 public sealed class PdfMetadataService : IPdfMetadataService, IDisposable
 {
     private readonly ILogger<PdfMetadataService> _logger;
-    private bool _disposed;
 
     public PdfMetadataService(ILogger<PdfMetadataService> logger) => _logger = logger;
 
@@ -62,13 +61,8 @@ public sealed class PdfMetadataService : IPdfMetadataService, IDisposable
         finally
         {
             document?.Close();
-            if (!_disposed)
-            {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
         }
     }
 
-    public void Dispose() => _disposed = true;
+    public void Dispose() { }
 }

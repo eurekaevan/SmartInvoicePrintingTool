@@ -40,18 +40,18 @@
             <!-- 2. 路径选择区 (卡片风格) -->
             <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto" RowSpacing="10" ColumnSpacing="10">
                 <!-- 源路径 -->
-                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="📂" Margin="0,0,10,0" VerticalAlignment="Center" />
-                    <TextBox Text="{Binding SourcePath}" PlaceholderText="点击右侧按钮选择源文件夹" IsReadOnly="True" VerticalAlignment="Center" Width="400" />
-                </StackPanel>
+                <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="Auto, *">
+                    <TextBlock Grid.Column="0" Text="📂" Margin="0,0,10,0" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Text="{Binding SourcePath}" PlaceholderText="点击右侧按钮选择源文件夹" IsReadOnly="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+                </Grid>
                 <Button Grid.Row="0" Grid.Column="1" Content="浏览源目录" Command="{Binding BrowseSourceCommand}" 
                         Classes="command-btn" HorizontalAlignment="Right" />
 
                 <!-- 输出路径 -->
-                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="📥" Margin="0,0,10,0" VerticalAlignment="Center" />
-                    <TextBox Text="{Binding OutputPath}" PlaceholderText="点击右侧按钮选择输出目录" IsReadOnly="True" VerticalAlignment="Center" Width="400" />
-                </StackPanel>
+                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="Auto, *">
+                    <TextBlock Grid.Column="0" Text="📥" Margin="0,0,10,0" VerticalAlignment="Center" />
+                    <TextBox Grid.Column="1" Text="{Binding OutputPath}" PlaceholderText="点击右侧按钮选择输出目录" IsReadOnly="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+                </Grid>
                 <Button Grid.Row="1" Grid.Column="1" Content="浏览输出目录" Command="{Binding BrowseOutputCommand}" 
                         Classes="command-btn" HorizontalAlignment="Right" />
             </Grid>
@@ -62,7 +62,8 @@
                     <TextBlock Text="选择打印机" FontWeight="SemiBold" Margin="0,0,0,5" />
                     <ComboBox ItemsSource="{Binding Printers}" 
                               SelectedItem="{Binding SelectedPrinter}"
-                              PlaceholderText="选择目标打印机" />
+                              PlaceholderText="选择目标打印机"
+                              HorizontalAlignment="Stretch" />
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Spacing="10">

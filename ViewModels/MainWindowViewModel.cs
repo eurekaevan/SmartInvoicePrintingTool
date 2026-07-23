@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -57,13 +57,17 @@ public partial class MainWindowViewModel : ViewModelBase
         try
         {
             var printers = await _printingService.GetAvailablePrintersAsync();
-            foreach (var p in printers)
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
             {
-                Printers.Add(p);
-            }
+                Printers.Clear();
+                foreach (var p in printers)
+                {
+                    Printers.Add(p);
+                }
 
-            if (Printers.Count > 0)
-                SelectedPrinter = Printers[0]; // 默认选中第一个
+                if (Printers.Count > 0)
+                    SelectedPrinter = Printers[0]; // 默认选中第一个
+            });
         }
         catch (Exception ex)
         {
@@ -95,6 +99,18 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task StartProcessing()
     {
         if (IsBusy) return;
+
+        if (string.IsNullOrWhiteSpace(SourcePath) || !System.IO.Directory.Exists(SourcePath))
+        {
+            StatusMessage = "❌ 请先选择有效的源 PDF 目录！";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(OutputPath) || !System.IO.Directory.Exists(OutputPath))
+        {
+            StatusMessage = "❌ 请先选择有效的输出 PDF 目录！";
+            return;
+        }
         
         _cts = new CancellationTokenSource();
         IsBusy = true;

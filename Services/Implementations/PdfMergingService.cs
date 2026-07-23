@@ -13,7 +13,6 @@ namespace SmartInvoicePrintingTool.Services.Implementations;
 public sealed class PdfMergingService : IPdfMergingService, IDisposable
 {
     private readonly ILogger<PdfMergingService> _logger;
-    private bool _disposed;
 
     public PdfMergingService(ILogger<PdfMergingService> logger) => _logger = logger;
 
@@ -32,10 +31,10 @@ public sealed class PdfMergingService : IPdfMergingService, IDisposable
             {
                 ct.ThrowIfCancellationRequested();
 
-                var meta1 = GetMetadata(pdf1Path);
-                var meta2 = GetMetadata(pdf2Path);
+                form1 = XPdfForm.FromFile(pdf1Path);
+                form2 = XPdfForm.FromFile(pdf2Path);
 
-                if (meta1 == null || meta2 == null) return false;
+                if (form1.Page == null || form2.Page == null) return false;
 
                 outputDocument = new PdfDocument();
                 var page = outputDocument.AddPage();
@@ -45,19 +44,21 @@ public sealed class PdfMergingService : IPdfMergingService, IDisposable
                 var gfx = XGraphics.FromPdfPage(page);
 
                 // 绘制第一个 PDF
-                form1 = XPdfForm.FromFile(pdf1Path);
+                var width1 = form1.Page.Width.Point;
+                var height1 = form1.Page.Height.Point;
                 var rect1 = new XRect(
                     0, 0,
-                    meta1.Value.Width * scale1,
-                    meta1.Value.Height * scale1);
+                    width1 * scale1,
+                    height1 * scale1);
                 gfx.DrawImage(form1, rect1);
 
                 // 绘制第二个 PDF
-                form2 = XPdfForm.FromFile(pdf2Path);
+                var width2 = form2.Page.Width.Point;
+                var height2 = form2.Page.Height.Point;
                 var rect2 = new XRect(
-                    0, meta1.Value.Height * scale1 + PdfConstants.Spacing,
-                    meta2.Value.Width * scale2,
-                    meta2.Value.Height * scale2);
+                    0, height1 * scale1 + PdfConstants.Spacing,
+                    width2 * scale2,
+                    height2 * scale2);
                 gfx.DrawImage(form2, rect2);
 
                 outputDocument.Save(outputPath);
@@ -80,35 +81,8 @@ public sealed class PdfMergingService : IPdfMergingService, IDisposable
             form2?.Dispose();
             form1?.Dispose();
             outputDocument?.Dispose();
-
-            if (!_disposed)
-            {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
         }
     }
 
-    private (double Width, double Height)? GetMetadata(string path)
-    {
-        PdfDocument? doc = null;
-        try
-        {
-            doc = PdfReader.Open(path, PdfDocumentOpenMode.Import);
-            if (doc.PageCount == 0) return null;
-            var page = doc.Pages[0];
-            return (page.Width.Point, page.Height.Point);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "读取 PDF 失败: {Path}", path);
-            return null;
-        }
-        finally
-        {
-            doc?.Close();
-        }
-    }
-
-    public void Dispose() => _disposed = true;
+    public void Dispose() { }
 }
