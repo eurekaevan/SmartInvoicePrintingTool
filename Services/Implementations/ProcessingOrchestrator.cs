@@ -48,28 +48,43 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         // 1. 获取所有 PDF
         var pdfPaths = Directory.GetFiles(sourceFolder, "*.pdf");
         _logSink.Log($"找到 {pdfPaths.Length} 个 PDF 文件");
+        if (pdfPaths.Length == 0)
+        {
+            _logSink.Log("未找到有效的 PDF 文件");
+            progress?.Report(100);
+            return;
+        }
 
         // 2. 获取元数据
         var pdfs = new System.Collections.Generic.List<SmartInvoicePrintingTool.Models.PdfMetadata>();
         for (int i = 0; i < pdfPaths.Length; i++)
         {
+            ct.ThrowIfCancellationRequested();
             var meta = await _metadataService.GetMetadataAsync(pdfPaths[i], ct);
             if (meta != null) pdfs.Add(meta);
-            progress?.Report((double)i / pdfPaths.Length * 30);
+            progress?.Report((double)(i + 1) / pdfPaths.Length * 30);
         }
 
         // 3. 分类
+        ct.ThrowIfCancellationRequested();
         var (longPdfs, shortPdfs) = _classificationService.ClassifyPdfs(pdfs);
         _logSink.Log($"分类结果: 长PDF={longPdfs.Count}, 短PDF={shortPdfs.Count}");
 
         // 4. 配对
         var pairs = _pairMatchingService.MatchPairs(longPdfs, shortPdfs);
         _logSink.Log($"匹配到 {pairs.Count} 对");
+        if (pairs.Count == 0)
+        {
+            _logSink.Log("未配对到可合并的 PDF 文件组");
+            progress?.Report(100);
+            return;
+        }
 
         // 5. 计算缩放并合并
         int processed = 0;
         foreach (var pair in pairs)
         {
+            ct.ThrowIfCancellationRequested();
             var scales = _scaleService.CalculateScales(pair.LongPdf, pair.ShortPdf);
             if (scales == null)
             {
@@ -90,7 +105,7 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
                 _logSink.Log($"合并成功: {pair.OutputFileName}");
 
             processed++;
-            progress?.Report(30 + (double)processed / pairs.Count * 50);
+            progress?.Report(30 + (double)processed / pairs.Count * 70);
         }
 
         _logSink.Log("处理完成！");

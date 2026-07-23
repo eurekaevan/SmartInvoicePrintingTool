@@ -17,7 +17,7 @@ public class PdfClassificationService : IPdfClassificationService
 
         foreach (var pdf in pdfs)
         {
-            if (pdf == null) continue;
+            if (pdf == null || pdf.Width <= 0 || pdf.Height <= 0) continue;
 
             // 宽长比小于阈值 = 长 PDF（如发票）
             var ratio = Math.Min(pdf.Width, pdf.Height) / Math.Max(pdf.Width, pdf.Height);
