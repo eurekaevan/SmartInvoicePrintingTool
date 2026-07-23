@@ -1,0 +1,18 @@
+# Build output directories
+[Bb]in/
+[Oo]bj/
+out/
+
+# IDE & Editor specific files
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+
+# OS generated files
+.DS_Store
+Thumbs.db
