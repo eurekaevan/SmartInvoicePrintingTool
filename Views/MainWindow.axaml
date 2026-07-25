@@ -4,6 +4,7 @@
         x:Class="SmartInvoicePrintingTool.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Smart Invoice Printing Tool - 智能发票打印控制终端"
+        Icon="/Assets/logo.ico"
         Width="980" Height="720"
         MinWidth="850" MinHeight="620"
         WindowStartupLocation="CenterScreen"
