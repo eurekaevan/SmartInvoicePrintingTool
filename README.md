@@ -1,130 +1,103 @@
-## 🚀 项目简介
+# 🖨️ Smart Invoice Printing Tool (智能发票合并打印工具)
 
-**Smart Invoice Printing Tool** 是一个智能的发票打印工具，专门为需要高效打印发票的用户设计。核心功能是在一张 A4 纸上智能排布并打印两张发票，通过动态计算最佳缩放比例，最大化利用纸张空间，节省打印成本。
-
-> 💡 **为什么选择这个工具？** 
-> - 自动计算最佳缩放比例，无需手动调整
-> - 在 A4 纸上完美打印两张发票，节省纸张
-> - 支持多种尺寸的 PDF 发票文件
-> - 直观易用的用户界面
+> **基于 Avalonia UI 12 与 .NET 10 打造的前卫桌面级智能发票识别合并、版面排版与批量打印控制终端。**
 
 ---
 
-## ⭐ 功能特性
+## ⚡ 核心亮点 (Key Features)
 
-- **🔄 智能缩放适配** - 自动计算每个发票文件的最佳缩放比例
-- **📄 A4 纸双排布** - 在单张 A4 纸上智能排布两张发票
-- **⚡ 批量处理** - 支持同时处理多个发票文件
-- **🎯 PDF 兼容性** - 支持标准 PDF 发票格式
-- **🖨️ 打印优化** - 使用 SumatraPDF 确保打印质量
-- **🎨 现代 UI** - 基于 .NET MAUI 的现代化用户界面
-
-### 技术栈
-```
-.NET MAUI 10.0    - 跨平台应用框架
-C# 10.0           - 主要开发语言  
-PDFsharp 6.2.3    - PDF 文档处理
-SumatraPDF        - 打印引擎
-MVVM 架构         - 清晰的代码架构
-```
+- 🎨 **前卫赛博霓虹视觉 (Futuristic Cyber Neon Aesthetic)**：
+  - 采用渐变黑洞背景（`#06070C`）与三色极光光晕（`#EC4899` 桃红 / `#8B5CF6` 紫罗兰 / `#06B6D4` 荧光青），带来前卫、震撼且大气的桌面端 UI 体验。
+- 📊 **双栏网格仪表盘布局 (58% : 42% Split-View Dashboard Grid)**：
+  - 突破传统上下堆叠，采用双栏现代布局：左栏聚焦目录路由与进度，右栏集结设备选择、Hero 控制按键与控制台，秩序感强，舒展有张力。
+- 🌐 **实时中英文双语切换 (i18n Localization)**：
+  - 顶栏内置 `🌐 English / 🌐 中文` 一键无缝切换按键，全界面文本、占位符、弹窗及状态提示实时零延迟更新。
+- 🔄 智能发票 A4 自动配对与缩放 (Smart Pair Matching & Scaling)**：
+  - 自动读取与分类 PDF 发票尺寸，智能匹配长短票，计算 A4 纸最佳利用缩放比例（最大化打印清晰度），在一张 A4 纸上优雅并行合并排版两张发票，大幅节省纸张成本。
+- 📜 **赛博 Terminal 监控终端 (Dev Terminal Console)**：
+  - 嵌入式 macOS/Cyber 控制点终端，带状态颜色指示与快捷清空功能，实时捕获后台编排与处理日志。
 
 ---
 
-## 🎯 使用方法
+## 🛠️ 技术栈 (Tech Stack)
 
-### 基础使用流程
-
-1. **选择发票文件夹** - 点击"选择发票文件夹"按钮，选择包含发票 PDF 文件的目录
-2. **选择输出文件夹** - 点击"选择输出文件夹"按钮，选择合并后 PDF 的保存位置
-3. **设置打印机** - 在打印机名称文本框输入打印机名称（可选）
-4. **开始处理** - 点击"开始处理并打印"按钮
-
-### 处理流程演示
-```
-选择文件夹 → 扫描PDF文件 → 智能匹配 → 最佳缩放计算 → PDF合并 → 批量打印
-```
-
-### 支持的发票格式
-- 标准 PDF 发票文件
-- 各种尺寸的 PDF 文档
-- 多页面 PDF（仅使用第一页）
+| 领域 / 模块 | 技术选型 | 说明 |
+| :--- | :--- | :--- |
+| **应用框架** | [Avalonia UI 12.0.4](https://avaloniaui.net/) | 高性能跨平台 XAML 桌面 GUI 框架 |
+| **运行时环境** | .NET 10.0 (C# 12) | 现代最新 .NET 运行时 |
+| **架构模式** | MVVM (CommunityToolkit.Mvvm 8.4.2) | 属性自动生成、弱引用与 RelayCommand |
+| **PDF 处理** | PdfSharp 6.2.4 | PDF 元数据提取、页面缩放绘制与合并导出 |
+| **依赖注入** | Microsoft.Extensions.DependencyInjection | 松耦合 Service 托管架构 |
 
 ---
 
-## 🏗️ 技术架构
+## 📂 项目结构 (Project Architecture)
 
-### 项目结构
 ```
 SmartInvoicePrintingTool/
-├── Models/
-│   └── PdfMetadata.cs          # PDF 元数据模型
-├── Services/
-│   ├── FileProcessor.cs        # 文件处理服务
-│   └── SumatraPrinter.cs       # 打印服务
-├── ViewModels/
-│   └── MainViewModel.cs        # 主视图模型
-├── Views/
-│   └── MainPage.xaml           # 主页面
-└── Utils/
-    └── ConfigHelper.cs         # 配置辅助类
+├── Assets/                        # 资源文件
+├── Models/                        # 领域模型
+│   ├── PdfMetadata.cs             # PDF 元数据定义 (尺寸、页数)
+│   └── PdfPair.cs                 # 配对发票组数据模型
+├── Services/                      # 核心业务服务层
+│   ├── Abstractions/              # 服务接口定义 (ILogSink, IPdfMergingService...)
+│   └── Implementations/           # 业务逻辑实现 (ProcessingOrchestrator, PdfPrintingService...)
+├── ViewModels/                    # 视图模型
+│   ├── ViewModelBase.cs           # ViewModel 抽象基类
+│   └── MainWindowViewModel.cs     # 主界面 ViewModel (状态控制、i18n 字典、Command)
+├── Views/                         # XAML 视图层
+│   ├── MainWindow.axaml           # 赛博双栏网格主界面
+│   └── MainWindow.axaml.cs        # 视图后台代码 (安全对话框绑定)
+├── Utils/                         # 工具辅助类
+│   ├── SafeFileDialogs.cs         # 现代 StorageProvider 文件夹选择器
+│   └── PdfConstants.cs            # A4 尺寸常量定义
+├── App.axaml                      # 全局主题样式、调色板与控件 Template
+├── App.axaml.cs                   # 应用初始化与依赖注入容器注册
+└── Program.cs                     # 应用入口点
 ```
-
-### 核心算法
-
-#### 智能缩放算法
-```csharp
-// 寻找最优缩放比例
-public (double LongScale, double ShortScale)? FindOptimalScales(
-    PdfMetadata longPdf, 
-    PdfMetadata shortPdf)
-{
-    // 约束条件：两张发票总高度 ≤ A4 纸高度
-    // 目标：最大化缩放比例，提高可读性
-    // 搜索策略：从 100% 到 70% 逐步递减
-}
-```
-
-#### PDF 合并流程
-```csharp
-// 创建合并 PDF
-public bool CreateMergedPdf(
-    string pdf1Path, double pdf1Scale,
-    string pdf2Path, double pdf2Scale, 
-    string outputPath)
-{
-    // 创建新的 PDF 文档
-    // 添加 A4 页面
-    // 按计算位置绘制两个发票
-    // 保存合并文件
-}
-```
-
-### 架构优势
-- **MVVM 模式** - UI 与业务逻辑分离
-- **依赖注入** - 松耦合的服务架构
-- **异步处理** - 高性能，无 UI 阻塞
-- **错误处理** - 全面的异常处理机制
 
 ---
 
-## 📊 性能指标
+## 🚀 快速开始 (Getting Started)
 
-### 处理速度
-- **小文件（<1MB）**: 平均 50-100ms/文件
-- **大文件（1-5MB）**: 平均 200-500ms/文件
-- **批量处理**: 支持并行处理多个文件
+### 环境要求
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download) 或更高版本
+- Rider / Visual Studio 2022 / VS Code (需安装 C# & Avalonia 扩展)
 
-### 内存使用
-- **基础内存**: ~50MB
-- **处理时峰值**: ~100-200MB（取决于文件大小）
-- **资源释放**: 完整的资源清理机制
+### 构建与运行
 
-### 支持的并发
-- **文件处理**: 支持并行处理
-- **打印队列**: 智能队列管理
-- **UI 响应**: 异步操作，无阻塞
+1. **克隆项目到本地**：
+   ```bash
+   git clone <repository-url>
+   cd SmartInvoicePrintingTool
+   ```
 
+2. **编译项目**：
+   ```bash
+   dotnet build
+   ```
+
+3. **运行应用**：
+   ```bash
+   dotnet run
+   ```
+
+---
+
+## 🎯 基础使用流程
+
+1. **配置源与输出目录**：
+   - 点击 **“浏览源目录”** 选择存有发票 PDF 的文件夹。
+   - 点击 **“浏览输出目录”** 选择合并后生成的 PDF 保存位置。
+2. **选择目标打印设备**：
+   - 从 **“目标打印设备选择”** 下拉菜单中选择目标物理或虚拟打印机。
+3. **语言切换（可选）**：
+   - 点击顶栏右侧 **`🌐 English / 🌐 中文`** 按键，随心切换界面语言。
+4. **开始合并与打印**：
+   - 点击 **`▶ 开始合并并打印`** 主控制按钮，系统自动开始扫描、配对、计算缩放比、合并 PDF，并在 Terminal 控制台中实时输出日志。
+
+---
 
 <p align="center">
-  Made with ❤️ using .NET MAUI
+  Crafted with ❤️ using Avalonia UI & .NET 10
 </p>
