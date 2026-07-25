@@ -28,6 +28,33 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private string _outputPath = string.Empty;
 
     [ObservableProperty] private string _logContent = string.Empty;
+    [ObservableProperty] private bool _isEnglish;
+
+    [RelayCommand]
+    private void ToggleLanguage()
+    {
+        IsEnglish = !IsEnglish;
+        OnPropertyChanged(string.Empty);
+    }
+
+    // 国际化 i18n 属性字典
+    public string LSubtitle => IsEnglish ? "Batch Invoice Recognition & Smart Printing Control Center" : "智能发票批量识别合并 • 自动版面精印控制中枢";
+    public string LSystemReady => IsEnglish ? "SYSTEM READY" : "系统就绪";
+    public string LDirConfig => IsEnglish ? "Directory Setup" : "目录路由配置";
+    public string LSourcePathLabel => IsEnglish ? "Source Invoice PDF Directory" : "源发票 PDF 包含目录";
+    public string LSourcePathPlaceholder => IsEnglish ? "Click button on right to pick source folder..." : "点击右侧按钮选择发票源目录...";
+    public string LBrowseSource => IsEnglish ? "Browse Source" : "浏览源目录";
+    public string LOutputPathLabel => IsEnglish ? "Processed PDF Output Directory" : "处理完成 PDF 输出目录";
+    public string LOutputPathPlaceholder => IsEnglish ? "Click button on right to pick output folder..." : "点击右侧按钮选择生成结果保存目录...";
+    public string LBrowseOutput => IsEnglish ? "Browse Output" : "浏览输出目录";
+    public string LPrinterSelect => IsEnglish ? "Target Printer Selection" : "目标打印设备选择";
+    public string LPrinterPlaceholder => IsEnglish ? "Select printer device..." : "选择打印机设备...";
+    public string LStartPrint => IsEnglish ? "Start Merge & Print" : "开始合并并打印";
+    public string LForceStop => IsEnglish ? "Force Stop" : "强制终止";
+    public string LStatusLabel => IsEnglish ? "Status:" : "执行状态:";
+    public string LTerminalLog => IsEnglish ? "TERMINAL LOG MONITOR" : "实时控制台日志";
+    public string LClearLog => IsEnglish ? "CLEAR" : "清空";
+    public string LLangSwitchText => IsEnglish ? "🌐 中文" : "🌐 English";
     
     // 打印机相关
     public ObservableCollection<string> Printers { get; } = new();
@@ -80,7 +107,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (SelectFolder != null)
         {
-            var path = await SelectFolder("请选择源 PDF 文件夹");
+            var title = IsEnglish ? "Select Source PDF Folder" : "请选择源 PDF 文件夹";
+            var path = await SelectFolder(title);
             if (path != null) SourcePath = path;
         }
     }
@@ -90,7 +118,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (SelectFolder != null)
         {
-            var path = await SelectFolder("请选择输出 PDF 文件夹");
+            var title = IsEnglish ? "Select Output PDF Folder" : "请选择输出 PDF 文件夹";
+            var path = await SelectFolder(title);
             if (path != null) OutputPath = path;
         }
     }
@@ -102,33 +131,33 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(SourcePath) || !System.IO.Directory.Exists(SourcePath))
         {
-            StatusMessage = "❌ 请先选择有效的源 PDF 目录！";
+            StatusMessage = IsEnglish ? "❌ Please select a valid source PDF directory first!" : "❌ 请先选择有效的源 PDF 目录！";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(OutputPath) || !System.IO.Directory.Exists(OutputPath))
         {
-            StatusMessage = "❌ 请先选择有效的输出 PDF 目录！";
+            StatusMessage = IsEnglish ? "❌ Please select a valid output PDF directory first!" : "❌ 请先选择有效的输出 PDF 目录！";
             return;
         }
         
         _cts = new CancellationTokenSource();
         IsBusy = true;
         IsCancellable = true;
-        StatusMessage = "正在处理中... (点击停止可取消)";
+        StatusMessage = IsEnglish ? "Processing... (Click stop to cancel)" : "正在处理中... (点击停止可取消)";
 
         try
         {
             await _orchestrator.ProcessAsync(SourcePath, OutputPath, new Progress<double>(p => ProgressValue = p * 100), _cts.Token);
-            StatusMessage = "✅ 处理完成！";
+            StatusMessage = IsEnglish ? "✅ Processing Completed!" : "✅ 处理完成！";
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = "⏹ 已停止任务";
+            StatusMessage = IsEnglish ? "⏹ Task Stopped" : "⏹ 已停止任务";
         }
         catch (Exception ex)
         {
-            StatusMessage = $"❌ 错误: {ex.Message}";
+            StatusMessage = IsEnglish ? $"❌ Error: {ex.Message}" : $"❌ 错误: {ex.Message}";
         }
         finally
         {
@@ -142,7 +171,13 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task StopProcessing()
     {
         _cts?.Cancel();
-        StatusMessage = "正在停止任务...";
+        StatusMessage = IsEnglish ? "Stopping task..." : "正在停止任务...";
+    }
+
+    [RelayCommand]
+    private void ClearLog()
+    {
+        LogContent = string.Empty;
     }
     private void OnLogReceived(object? sender, string e)
     {

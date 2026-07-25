@@ -3,108 +3,313 @@
         xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
         x:Class="SmartInvoicePrintingTool.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Smart Invoice Printing Tool"
-        Width="750" Height="600"
-        Background="{DynamicResource SystemFillColorSecondaryBackgroundBrush}"
-        WindowStartupLocation="CenterScreen">
+        Title="Smart Invoice Printing Tool - 智能发票打印控制终端"
+        Width="980" Height="720"
+        MinWidth="850" MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="#06070C">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <!-- 定义一些图标资源 -->
-    <Window.Styles>
-        <Style Selector="Button.command-btn">
-            <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="Padding" Value="15,8" />
-        </Style>
-    </Window.Styles>
+    <Window.Resources>
+        <!-- 矢量 Icon 资源定义 -->
+        <Geometry x:Key="IconInvoice">M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z</Geometry>
+        <Geometry x:Key="IconFolder">M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z</Geometry>
+        <Geometry x:Key="IconDownload">M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z</Geometry>
+        <Geometry x:Key="IconPrinter">M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V14H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z</Geometry>
+        <Geometry x:Key="IconPlay">M8 5v14l11-7z</Geometry>
+        <Geometry x:Key="IconStop">M6 6h12v12H6z</Geometry>
+        <Geometry x:Key="IconTerminal">M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z</Geometry>
+        <Geometry x:Key="IconTrash">M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z</Geometry>
+        <Geometry x:Key="IconZap">M13 2L3 14h9l-1 8 10-12h-9l1-8z</Geometry>
+        <Geometry x:Key="IconGlobe">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z</Geometry>
+    </Window.Resources>
 
-    <Border Margin="20" Padding="20" CornerRadius="12" 
-            Background="{DynamicResource SystemFillColorSurfaceBrush}"
-            BoxShadow="0 4 10 0 #20000000">
-        
-        <StackPanel Spacing="20">
-            
-            <!-- 1. 标题区 -->
-            <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock Text="🖨️" FontSize="32" VerticalAlignment="Center" />
-                <StackPanel>
-                    <TextBlock Text="Smart Invoice Printing Tool" FontWeight="SemiBold" FontSize="20" />
-                    <TextBlock Text="基于 Avalonia Fluent UI 设计" Foreground="{DynamicResource SystemControlDisabledForegroundBrush}" FontSize="12" />
+    <Grid RowDefinitions="Auto, *">
+        <!-- 氛围感发光背景 (Cyber Neon Glow Orbs) -->
+        <Canvas Grid.RowSpan="2" IsHitTestVisible="False">
+            <Ellipse Width="500" Height="500" Canvas.Left="-140" Canvas.Top="-140" Opacity="0.22">
+                <Ellipse.Fill>
+                    <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%">
+                        <GradientStop Offset="0" Color="#EC4899" />
+                        <GradientStop Offset="1" Color="#00000000" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+
+            <Ellipse Width="550" Height="550" Canvas.Right="-170" Canvas.Top="-170" Opacity="0.25">
+                <Ellipse.Fill>
+                    <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%">
+                        <GradientStop Offset="0" Color="#8B5CF6" />
+                        <GradientStop Offset="1" Color="#00000000" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+
+            <Ellipse Width="480" Height="480" Canvas.Left="220" Canvas.Bottom="-140" Opacity="0.2">
+                <Ellipse.Fill>
+                    <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%">
+                        <GradientStop Offset="0" Color="#06B6D4" />
+                        <GradientStop Offset="1" Color="#00000000" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+        </Canvas>
+
+        <!-- 1. Header 大胆前卫顶栏 (Cyber Neon Navigation Header) -->
+        <Border Grid.Row="0" Padding="30,22,30,18" Background="#0C0D18" BorderThickness="0,0,0,1.5">
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                    <GradientStop Offset="0.0" Color="#EC4899" />
+                    <GradientStop Offset="0.5" Color="#8B5CF6" />
+                    <GradientStop Offset="1.0" Color="#06B6D4" />
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="18" VerticalAlignment="Center">
+                    <!-- Logo 容器 (大角度渐变浮雕) -->
+                    <Border Width="52" Height="52" CornerRadius="15" ClipToBounds="True">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                <GradientStop Offset="0.0" Color="#EC4899" />
+                                <GradientStop Offset="0.5" Color="#8B5CF6" />
+                                <GradientStop Offset="1.0" Color="#06B6D4" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <PathIcon Data="{StaticResource IconZap}" Foreground="White" Width="28" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <!-- 标题与赛博 Badge -->
+                    <StackPanel VerticalAlignment="Center" Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="Smart Invoice Tool" FontSize="22" FontWeight="Black" Foreground="#FFFFFF" LetterSpacing="0.6" />
+                            <!-- 赛博胶囊 Badge -->
+                            <Border CornerRadius="20" Padding="12,4" VerticalAlignment="Center">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                        <GradientStop Offset="0.0" Color="#30EC4899" />
+                                        <GradientStop Offset="1.0" Color="#308B5CF6" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.BorderBrush>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                        <GradientStop Offset="0.0" Color="#EC4899" />
+                                        <GradientStop Offset="1.0" Color="#8B5CF6" />
+                                    </LinearGradientBrush>
+                                </Border.BorderBrush>
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <PathIcon Data="{StaticResource IconZap}" Foreground="#F472B6" Width="11" Height="11" />
+                                    <TextBlock Text="NEON PRO v1.0" FontSize="11" Foreground="#F472B6" FontWeight="Black" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        <!-- 副标题：醒目又不喧宾夺主 (13.5px 优雅中灰) -->
+                        <TextBlock Text="{Binding LSubtitle}" FontSize="13.5" Foreground="#A1A1AA" FontWeight="Medium" />
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
 
-            <Separator />
+                <!-- 右侧中英文语言切换与 LIVE 状态 -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                    <Border Background="#121324" CornerRadius="10" Padding="14,8" BorderBrush="#8B5CF6" BorderThickness="1">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Ellipse Width="10" Height="10" Fill="#00F2FE" />
+                            <TextBlock Text="{Binding LSystemReady}" FontSize="12" Foreground="#00F2FE" FontWeight="Black" LetterSpacing="1" />
+                        </StackPanel>
+                    </Border>
 
-            <!-- 2. 路径选择区 (卡片风格) -->
-            <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto" RowSpacing="10" ColumnSpacing="10">
-                <!-- 源路径 -->
-                <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="Auto, *">
-                    <TextBlock Grid.Column="0" Text="📂" Margin="0,0,10,0" VerticalAlignment="Center" />
-                    <TextBox Grid.Column="1" Text="{Binding SourcePath}" PlaceholderText="点击右侧按钮选择源文件夹" IsReadOnly="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
-                </Grid>
-                <Button Grid.Row="0" Grid.Column="1" Content="浏览源目录" Command="{Binding BrowseSourceCommand}" 
-                        Classes="command-btn" HorizontalAlignment="Right" />
-
-                <!-- 输出路径 -->
-                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="Auto, *">
-                    <TextBlock Grid.Column="0" Text="📥" Margin="0,0,10,0" VerticalAlignment="Center" />
-                    <TextBox Grid.Column="1" Text="{Binding OutputPath}" PlaceholderText="点击右侧按钮选择输出目录" IsReadOnly="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
-                </Grid>
-                <Button Grid.Row="1" Grid.Column="1" Content="浏览输出目录" Command="{Binding BrowseOutputCommand}" 
-                        Classes="command-btn" HorizontalAlignment="Right" />
+                    <!-- 语言切换按钮 (赛博线框风格) -->
+                    <Button Command="{Binding ToggleLanguageCommand}" Classes="btn-cyber-outline" Padding="14,7" Height="38" VerticalAlignment="Center" ToolTip.Tip="Switch Language / 切换界面语言">
+                        <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                            <PathIcon Data="{StaticResource IconGlobe}" Foreground="#00F2FE" Width="15" Height="15" />
+                            <TextBlock Text="{Binding LLangSwitchText}" FontSize="13" FontWeight="Bold" Foreground="#00F2FE" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
             </Grid>
+        </Border>
 
-            <!-- 3. 打印机与操作区 -->
-            <Grid ColumnDefinitions="*, Auto">
-                <StackPanel Spacing="5">
-                    <TextBlock Text="选择打印机" FontWeight="SemiBold" Margin="0,0,0,5" />
-                    <ComboBox ItemsSource="{Binding Printers}" 
-                              SelectedItem="{Binding SelectedPrinter}"
-                              PlaceholderText="选择目标打印机"
-                              HorizontalAlignment="Stretch" />
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" Spacing="10">
-                    <Button Content="▶ 开始合并并打印" 
-                            Command="{Binding StartProcessingCommand}" 
-                            IsEnabled="{Binding !IsBusy}"
-                            Classes="command-btn" 
-                            HorizontalAlignment="Stretch" />
+        <!-- 2. 保留双栏网格仪表盘结构：升级为前卫赛博霓虹视觉 (58% : 42% Two-Column Grid) -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Border Padding="28">
+                <Grid ColumnDefinitions="58*, 24, 42*">
                     
-                    <Button Content="⏹ 强制停止" 
-                            Command="{Binding StopProcessingCommand}" 
-                            IsEnabled="{Binding IsCancellable}"
-                            Theme="{StaticResource FlatButtonTheme}"
-                            Foreground="Red"
-                            HorizontalAlignment="Stretch" />
-                </StackPanel>
-            </Grid>
+                    <!-- LEFT COLUMN (左栏 58%): 核心目录配置与执行进度 -->
+                    <StackPanel Grid.Column="0" Spacing="22">
 
-            <!-- 4. 进度与状态 -->
-            <StackPanel Spacing="5">
-                <Grid ColumnDefinitions="*, Auto">
-                    <ProgressBar Value="{Binding ProgressValue}" Height="8" CornerRadius="4" />
-                    <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="10,0,0,0" Foreground="{DynamicResource SystemControlForegroundBrush}" />
+                        <!-- BLOCK 1: 📂 目录路由配置卡片 -->
+                        <Border Classes="cyber-card">
+                            <StackPanel Spacing="18">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Background="#208B5CF6" CornerRadius="8" Padding="7">
+                                        <PathIcon Data="{StaticResource IconFolder}" Foreground="#C084FC" Width="18" Height="18" />
+                                    </Border>
+                                    <TextBlock Text="{Binding LDirConfig}" FontWeight="Black" FontSize="16.5" Foreground="#F9FAFB" />
+                                </StackPanel>
+
+                                <!-- 源 PDF 路径包含框 -->
+                                <Grid RowDefinitions="Auto, Auto" RowSpacing="7">
+                                    <TextBlock Grid.Row="0" Text="{Binding LSourcePathLabel}" FontSize="13.5" Foreground="#A1A1AA" FontWeight="SemiBold" Margin="0,0,0,2" />
+                                    <Grid Grid.Row="1" ColumnDefinitions="*, Auto" ColumnSpacing="12">
+                                        <Grid Grid.Column="0" ColumnDefinitions="Auto, *">
+                                            <Border Grid.Column="0" Background="#141526" CornerRadius="10,0,0,10" Padding="14,0" BorderBrush="#232438" BorderThickness="1,1,0,1">
+                                                <PathIcon Data="{StaticResource IconFolder}" Foreground="#8B5CF6" Width="16" Height="16" />
+                                            </Border>
+                                            <TextBox Grid.Column="1" Text="{Binding SourcePath}" PlaceholderText="{Binding LSourcePathPlaceholder}" IsReadOnly="True" CornerRadius="0,10,10,0" Height="40" VerticalAlignment="Center" FontSize="14" />
+                                        </Grid>
+                                        <Button Grid.Column="1" Content="{Binding LBrowseSource}" Command="{Binding BrowseSourceCommand}" Classes="btn-cyber-outline" Height="40" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Grid>
+
+                                <Separator Background="#1E1F35" Height="1" Margin="0,3" />
+
+                                <!-- 输出 PDF 路径包含框 -->
+                                <Grid RowDefinitions="Auto, Auto" RowSpacing="7">
+                                    <TextBlock Grid.Row="0" Text="{Binding LOutputPathLabel}" FontSize="13.5" Foreground="#A1A1AA" FontWeight="SemiBold" Margin="0,0,0,2" />
+                                    <Grid Grid.Row="1" ColumnDefinitions="*, Auto" ColumnSpacing="12">
+                                        <Grid Grid.Column="0" ColumnDefinitions="Auto, *">
+                                            <Border Grid.Column="0" Background="#141526" CornerRadius="10,0,0,10" Padding="14,0" BorderBrush="#232438" BorderThickness="1,1,0,1">
+                                                <PathIcon Data="{StaticResource IconDownload}" Foreground="#06B6D4" Width="16" Height="16" />
+                                            </Border>
+                                            <TextBox Grid.Column="1" Text="{Binding OutputPath}" PlaceholderText="{Binding LOutputPathPlaceholder}" IsReadOnly="True" CornerRadius="0,10,10,0" Height="40" VerticalAlignment="Center" FontSize="14" />
+                                        </Grid>
+                                        <Button Grid.Column="1" Content="{Binding LBrowseOutput}" Command="{Binding BrowseOutputCommand}" Classes="btn-cyber-outline" Height="40" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- BLOCK 2: 📊 实时执行状态与霓虹流光进度仪表盘 -->
+                        <Border Classes="cyber-card" Padding="22,18">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="*, Auto">
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding LStatusLabel}" FontSize="14" Foreground="#9CA3AF" FontWeight="Bold" />
+                                        <TextBlock Text="{Binding StatusMessage}" FontSize="14.5" Foreground="#00F2FE" FontWeight="Bold" />
+                                    </StackPanel>
+
+                                    <!-- 百分比发光胶囊 -->
+                                    <Border Grid.Column="1" Background="#208B5CF6" CornerRadius="8" Padding="12,5" BorderBrush="#8B5CF6" BorderThickness="1">
+                                        <TextBlock Text="{Binding ProgressValue, StringFormat='{}{0:F0}%'}" FontSize="15" FontWeight="Black" Foreground="#C084FC" />
+                                    </Border>
+                                </Grid>
+
+                                <!-- 霓虹三色渐变进度条 -->
+                                <ProgressBar Value="{Binding ProgressValue}" Height="11" CornerRadius="5.5" Background="#0B0C15">
+                                    <ProgressBar.Foreground>
+                                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                            <GradientStop Offset="0.0" Color="#EC4899" />
+                                            <GradientStop Offset="0.5" Color="#8B5CF6" />
+                                            <GradientStop Offset="1.0" Color="#00F2FE" />
+                                        </LinearGradientBrush>
+                                    </ProgressBar.Foreground>
+                                </ProgressBar>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+
+                    <!-- RIGHT COLUMN (右栏 42%): 设备控制与 Terminal 控制台 -->
+                    <StackPanel Grid.Column="2" Spacing="22">
+
+                        <!-- BLOCK 3: 🖨️ 设备与控制中枢 -->
+                        <Border Classes="cyber-card">
+                            <StackPanel Spacing="18">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Background="#2006B6D4" CornerRadius="8" Padding="7">
+                                        <PathIcon Data="{StaticResource IconPrinter}" Foreground="#38BDF8" Width="18" Height="18" />
+                                    </Border>
+                                    <TextBlock Text="{Binding LPrinterSelect}" FontWeight="Black" FontSize="16.5" Foreground="#F9FAFB" />
+                                </StackPanel>
+
+                                <!-- 下拉选择 -->
+                                <ComboBox ItemsSource="{Binding Printers}" 
+                                          SelectedItem="{Binding SelectedPrinter}"
+                                          PlaceholderText="{Binding LPrinterPlaceholder}"
+                                          HorizontalAlignment="Stretch"
+                                          Height="42" 
+                                          FontSize="14" />
+
+                                <!-- 主控制操作组 (三色大渐变超炫按钮) -->
+                                <Grid ColumnDefinitions="*, 10, Auto">
+                                    <Button Grid.Column="0" 
+                                            Command="{Binding StartProcessingCommand}" 
+                                            IsEnabled="{Binding !IsBusy}"
+                                            Classes="btn-cyber-primary" 
+                                            Height="44"
+                                            HorizontalAlignment="Stretch">
+                                        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <PathIcon Data="{StaticResource IconPlay}" Foreground="White" Width="18" Height="18" />
+                                            <TextBlock Text="{Binding LStartPrint}" VerticalAlignment="Center" FontSize="15" FontWeight="Black" />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Grid.Column="2" 
+                                            Command="{Binding StopProcessingCommand}" 
+                                            IsEnabled="{Binding IsCancellable}"
+                                            Classes="btn-cyber-danger" 
+                                            Height="44">
+                                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                            <PathIcon Data="{StaticResource IconStop}" Foreground="#FF4D4D" Width="18" Height="18" />
+                                            <TextBlock Text="{Binding LForceStop}" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- BLOCK 4: 📜 赛博黑洞 Terminal 控制台日志 -->
+                        <Border Classes="cyber-card" Padding="0">
+                            <Grid RowDefinitions="Auto, *">
+                                <!-- macOS/Cyber 风格 Header -->
+                                <Border Grid.Row="0" Background="#0A0B13" Padding="20,14" CornerRadius="16,16,0,0" BorderBrush="#1E1F33" BorderThickness="0,0,0,1">
+                                    <Grid ColumnDefinitions="Auto, *, Auto">
+                                        <!-- 赛博控制点 -->
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                            <Ellipse Width="11" Height="11" Fill="#FF5F56" />
+                                            <Ellipse Width="11" Height="11" Fill="#FFBD2E" />
+                                            <Ellipse Width="11" Height="11" Fill="#27C93F" />
+                                        </StackPanel>
+
+                                        <!-- 标题 -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <PathIcon Data="{StaticResource IconTerminal}" Foreground="#34D399" Width="15" Height="15" />
+                                            <TextBlock Text="{Binding LTerminalLog}" FontWeight="Black" FontSize="13" Foreground="#34D399" LetterSpacing="1.2" />
+                                        </StackPanel>
+
+                                        <!-- 清空清屏按钮 -->
+                                        <Button Grid.Column="2" Command="{Binding ClearLogCommand}" Classes="btn-icon" ToolTip.Tip="Clear Console Logs">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <PathIcon Data="{StaticResource IconTrash}" Foreground="#9CA3AF" Width="14" Height="14" />
+                                                <TextBlock Text="{Binding LClearLog}" FontSize="12" Foreground="#9CA3AF" FontWeight="Bold" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 日志黑洞屏 -->
+                                <TextBox Grid.Row="1" 
+                                         Text="{Binding LogContent}" 
+                                         IsReadOnly="True" 
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         Height="210"
+                                         BorderThickness="0"
+                                         CornerRadius="0,0,16,16"
+                                         Padding="18,14"
+                                         Background="#040509"
+                                         Foreground="#00FF9D"
+                                         FontFamily="Consolas, Fira Code, Monaco, monospace"
+                                         FontSize="13"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                            </Grid>
+                        </Border>
+
+                    </StackPanel>
                 </Grid>
-            </StackPanel>
-
-            <!-- 5. 实时日志 -->
-            <StackPanel Spacing="5">
-                <TextBlock Text="运行日志" FontWeight="SemiBold" />
-                <TextBox Text="{Binding LogContent}" 
-                         IsReadOnly="True" 
-                         AcceptsReturn="True"
-                         TextWrapping="Wrap"
-                         Height="150"
-                         CornerRadius="8"
-                         Padding="10"
-                         Background="#101010"
-                         Foreground="#00FF00"
-                         FontFamily="Consolas"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto" />
-            </StackPanel>
-        </StackPanel>
-    </Border>
+            </Border>
+        </ScrollViewer>
+    </Grid>
 </Window>
