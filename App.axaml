@@ -1,171 +1,176 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="SmartInvoicePrintingTool.App"
-             xmlns:local="using:SmartInvoicePrintingTool"
              RequestedThemeVariant="Dark">
+    <Application.Resources>
+        <SolidColorBrush x:Key="BrushWindow">#0B0F19</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSurface">#121826</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSurfaceRaised">#182131</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushInput">#0E1420</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushBorder">#263247</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushBorderStrong">#36445D</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushTextPrimary">#F4F7FB</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushTextSecondary">#94A3B8</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushTextMuted">#64748B</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushPrimary">#6D5EF7</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushPrimaryHover">#8073FA</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushAccent">#4CC9F0</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSuccess">#34D399</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushDanger">#FB7185</SolidColorBrush>
+
+        <Geometry x:Key="IconFolder">M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z</Geometry>
+        <Geometry x:Key="IconDownload">M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z</Geometry>
+        <Geometry x:Key="IconPrinter">M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V14H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z</Geometry>
+        <Geometry x:Key="IconPlay">M8 5v14l11-7z</Geometry>
+        <Geometry x:Key="IconStop">M6 6h12v12H6z</Geometry>
+        <Geometry x:Key="IconTerminal">M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z</Geometry>
+        <Geometry x:Key="IconTrash">M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z</Geometry>
+        <Geometry x:Key="IconZap">M13 2L3 14h9l-1 8 10-12h-9l1-8z</Geometry>
+        <Geometry x:Key="IconGlobe">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z</Geometry>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
-        
-        <!-- 全局前卫无衬线科技字体体系 -->
+
         <Style Selector="Window">
             <Setter Property="FontFamily" Value="Inter, Segoe UI, Microsoft YaHei, sans-serif" />
             <Setter Property="FontSize" Value="14" />
         </Style>
 
-        <!-- 大胆赛博霓虹卡片边框 -->
         <Style Selector="Border.cyber-card">
-            <Setter Property="Background" Value="#0D0E19" />
-            <Setter Property="BorderBrush">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Offset="0.0" Color="#2A2B45" />
-                        <GradientStop Offset="0.5" Color="#8B5CF6" />
-                        <GradientStop Offset="1.0" Color="#1D1E30" />
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="16" />
-            <Setter Property="Padding" Value="22" />
-            <Setter Property="BoxShadow" Value="0 10 30 0 #40000000, 0 0 15 0 #208B5CF6" />
+            <Setter Property="Padding" Value="24" />
+            <Setter Property="BoxShadow" Value="0 10 28 0 #26000000" />
             <Setter Property="Transitions">
                 <Transitions>
-                    <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.3" />
-                    <BrushTransition Property="BorderBrush" Duration="0:0:0.3" />
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.18" />
+                    <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.18" />
                 </Transitions>
             </Setter>
         </Style>
 
         <Style Selector="Border.cyber-card:pointerover">
-            <Setter Property="BoxShadow" Value="0 12 35 0 #60000000, 0 0 25 0 #408B5CF6" />
-            <Setter Property="BorderBrush">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Offset="0.0" Color="#EC4899" />
-                        <GradientStop Offset="0.5" Color="#8B5CF6" />
-                        <GradientStop Offset="1.0" Color="#06B6D4" />
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
+            <Setter Property="BoxShadow" Value="0 12 34 0 #33000000" />
         </Style>
 
-        <!-- 超炫主操作按钮 (大红紫青炫彩渐变) -->
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+        </Style>
+
+        <Style Selector="TextBlock.field-label">
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
+            <Setter Property="FontWeight" Value="Medium" />
+        </Style>
+
+        <Style Selector="Border.icon-tile">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Background" Value="#1D2640" />
+        </Style>
+
         <Style Selector="Button.btn-cyber-primary">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Offset="0.0" Color="#EC4899" />
-                        <GradientStop Offset="0.5" Color="#8B5CF6" />
-                        <GradientStop Offset="1.0" Color="#3B82F6" />
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="{StaticResource BrushPrimary}" />
             <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="Black" />
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="26,12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="20,11" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Transitions">
                 <Transitions>
-                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" />
-                    <BrushTransition Property="Background" Duration="0:0:0.2" />
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
                 </Transitions>
             </Setter>
         </Style>
 
         <Style Selector="Button.btn-cyber-primary:pointerover">
-            <Setter Property="RenderTransform" Value="scale(1.04)" />
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Offset="0.0" Color="#F472B6" />
-                        <GradientStop Offset="0.5" Color="#A78BFA" />
-                        <GradientStop Offset="1.0" Color="#60A5FA" />
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="{StaticResource BrushPrimaryHover}" />
         </Style>
 
-        <!-- 危险强终止按钮 -->
         <Style Selector="Button.btn-cyber-danger">
-            <Setter Property="Background" Value="#1F0F1A" />
-            <Setter Property="Foreground" Value="#FF4D4D" />
-            <Setter Property="BorderBrush" Value="#FF2A55" />
-            <Setter Property="BorderThickness" Value="1.5" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="20,12" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Background" Value="#241A27" />
+            <Setter Property="Foreground" Value="{StaticResource BrushDanger}" />
+            <Setter Property="BorderBrush" Value="#573041" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="18,10" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" />
-                    <BrushTransition Property="Background" Duration="0:0:0.2" />
-                </Transitions>
-            </Setter>
         </Style>
 
         <Style Selector="Button.btn-cyber-danger:pointerover">
-            <Setter Property="Background" Value="#FF2A55" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="RenderTransform" Value="scale(1.03)" />
+            <Setter Property="Background" Value="#34202D" />
+            <Setter Property="BorderBrush" Value="#7A3C52" />
         </Style>
 
-        <!-- 霓虹科技线框浏览按钮 -->
         <Style Selector="Button.btn-cyber-outline">
-            <Setter Property="Background" Value="#141526" />
-            <Setter Property="Foreground" Value="#06B6D4" />
-            <Setter Property="BorderBrush" Value="#06B6D4" />
+            <Setter Property="Background" Value="{StaticResource BrushSurfaceRaised}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Padding" Value="18,8" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
-                    <BrushTransition Property="Background" Duration="0:0:0.2" />
-                </Transitions>
-            </Setter>
         </Style>
 
         <Style Selector="Button.btn-cyber-outline:pointerover">
-            <Setter Property="Background" Value="#06B6D4" />
-            <Setter Property="Foreground" Value="#090A10" />
-            <Setter Property="RenderTransform" Value="scale(1.02)" />
+            <Setter Property="Background" Value="#202B3E" />
+            <Setter Property="BorderBrush" Value="#52617A" />
         </Style>
 
-        <!-- 图标按钮 -->
         <Style Selector="Button.btn-icon">
             <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Padding" Value="8" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
+
         <Style Selector="Button.btn-icon:pointerover">
-            <Setter Property="Background" Value="#25273C" />
+            <Setter Property="Background" Value="{StaticResource BrushSurfaceRaised}" />
         </Style>
 
-        <!-- TextBox 赛博极客设计 -->
+        <Style Selector="Button:disabled">
+            <Setter Property="Opacity" Value="0.38" />
+        </Style>
+
         <Style Selector="TextBox">
             <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Background" Value="#080911" />
-            <Setter Property="BorderBrush" Value="#232438" />
-            <Setter Property="Foreground" Value="#F3F4F6" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Background" Value="{StaticResource BrushInput}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="SelectionBrush" Value="#666D5EF7" />
         </Style>
 
-        <!-- ComboBox 赛博极客设计 -->
+        <Style Selector="TextBox:focus-within">
+            <Setter Property="BorderBrush" Value="{StaticResource BrushPrimary}" />
+        </Style>
+
         <Style Selector="ComboBox">
             <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Background" Value="#080911" />
-            <Setter Property="BorderBrush" Value="#232438" />
-            <Setter Property="Foreground" Value="#F3F4F6" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Background" Value="{StaticResource BrushInput}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="MinHeight" Value="44" />
+        </Style>
+
+        <Style Selector="ComboBox:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
         </Style>
     </Application.Styles>
 </Application>

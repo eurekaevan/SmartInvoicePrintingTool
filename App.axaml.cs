@@ -14,38 +14,39 @@ namespace SmartInvoicePrintingTool;
 public partial class App : Application
 {
     public IServiceProvider Services { get; private set; } = null!;
-    
+
     public override void Initialize()
     {
-        AvaloniaXamlLoader.Load(this); // 修正 1：添加 this
+        AvaloniaXamlLoader.Load(this);
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        var services = ConfigureServices(); // 修正 2：添加 var
-        this.Services = services;
-        
+        var services = ConfigureServices();
+        Services = services;
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
             {
                 DataContext = services.GetRequiredService<MainWindowViewModel>()
             };
+            desktop.Exit += (_, _) => services.Dispose();
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private IServiceProvider ConfigureServices()
+    private ServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
-        
+
         services.AddLogging(builder =>
         {
             builder.AddDebug();
             builder.SetMinimumLevel(LogLevel.Debug);
         });
-        
+
         // 注册服务
         services.AddSingleton<IPdfMetadataService, PdfMetadataService>();
         services.AddSingleton<IPdfClassificationService, PdfClassificationService>();
@@ -54,12 +55,11 @@ public partial class App : Application
         services.AddSingleton<IPdfMergingService, PdfMergingService>();
         services.AddSingleton<IPdfPrintingService, PdfPrintingService>();
         services.AddSingleton<ILogSink, ReactiveLogSink>();
-        services.AddSingleton<IProgressReporter, ProgressReporter>();
         services.AddSingleton<IProcessingOrchestrator, ProcessingOrchestrator>();
-        
+
         // 注册 ViewModel
         services.AddTransient<MainWindowViewModel>();
-        
+
         return services.BuildServiceProvider();
     }
 }

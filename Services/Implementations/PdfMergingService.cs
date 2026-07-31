@@ -10,7 +10,7 @@ using SmartInvoicePrintingTool.Utils;
 
 namespace SmartInvoicePrintingTool.Services.Implementations;
 
-public sealed class PdfMergingService : IPdfMergingService, IDisposable
+public sealed class PdfMergingService : IPdfMergingService
 {
     private readonly ILogger<PdfMergingService> _logger;
 
@@ -41,7 +41,7 @@ public sealed class PdfMergingService : IPdfMergingService, IDisposable
                 page.Width = XUnit.FromPoint(PdfConstants.A4Width);
                 page.Height = XUnit.FromPoint(PdfConstants.A4Height);
 
-                var gfx = XGraphics.FromPdfPage(page);
+                using var gfx = XGraphics.FromPdfPage(page);
 
                 // 绘制第一个 PDF
                 var width1 = form1.Page.Width.Point;
@@ -69,7 +69,7 @@ public sealed class PdfMergingService : IPdfMergingService, IDisposable
         catch (OperationCanceledException)
         {
             _logger.LogInformation("合并操作已取消");
-            return false;
+            throw;
         }
         catch (Exception ex)
         {
@@ -83,6 +83,4 @@ public sealed class PdfMergingService : IPdfMergingService, IDisposable
             outputDocument?.Dispose();
         }
     }
-
-    public void Dispose() { }
 }

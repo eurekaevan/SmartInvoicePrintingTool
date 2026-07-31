@@ -23,4 +23,19 @@ public partial class MainWindow : Window
             vm.SelectFolder = async (title) => await SafeFileDialogs.PickFolderAsync(this, title);
         }
     }
+
+    protected override async void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        if (DataContext is MainWindowViewModel vm)
+            await vm.InitializeAsync();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        if (DataContext is IDisposable disposable)
+            disposable.Dispose();
+
+        base.OnClosed(e);
+    }
 }

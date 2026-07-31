@@ -1,0 +1,99 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
+             x:Class="SmartInvoicePrintingTool.Views.Components.DirectorySetupView"
+             x:DataType="vm:MainWindowViewModel">
+    <Border Classes="cyber-card">
+        <StackPanel Spacing="22">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                    <Border Classes="icon-tile">
+                        <PathIcon Data="{StaticResource IconFolder}"
+                                  Foreground="{StaticResource BrushPrimary}"
+                                  Width="17"
+                                  Height="17"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding LDirConfig}" Classes="section-title" />
+                        <TextBlock Text="PDF INPUT &amp; OUTPUT" FontSize="10" Foreground="{StaticResource BrushTextMuted}" LetterSpacing="1" />
+                    </StackPanel>
+                </StackPanel>
+                <Border Grid.Column="1"
+                        Background="#1A6D5EF7"
+                        CornerRadius="12"
+                        Padding="9,4"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="STEP 01" FontSize="10" FontWeight="SemiBold" Foreground="#B8B1FF" LetterSpacing="0.7" />
+                </Border>
+            </Grid>
+
+            <StackPanel Spacing="9">
+                <TextBlock Text="{Binding LSourcePathLabel}" Classes="field-label" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Grid Grid.Column="0" ColumnDefinitions="42,*">
+                        <Border Grid.Column="0"
+                                Background="{StaticResource BrushSurfaceRaised}"
+                                CornerRadius="10,0,0,10"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="1,1,0,1">
+                            <PathIcon Data="{StaticResource IconFolder}"
+                                      Foreground="{StaticResource BrushTextSecondary}"
+                                      Width="15"
+                                      Height="15"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                        </Border>
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding SourcePath}"
+                                 PlaceholderText="{Binding LSourcePathPlaceholder}"
+                                 IsReadOnly="True"
+                                 CornerRadius="0,10,10,0"
+                                 Height="44"
+                                 VerticalContentAlignment="Center" />
+                    </Grid>
+                    <Button Grid.Column="1"
+                            Content="{Binding LBrowseSource}"
+                            Command="{Binding BrowseSourceCommand}"
+                            IsEnabled="{Binding !IsBusy}"
+                            Classes="btn-cyber-outline"
+                            Height="44" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Spacing="9">
+                <TextBlock Text="{Binding LOutputPathLabel}" Classes="field-label" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Grid Grid.Column="0" ColumnDefinitions="42,*">
+                        <Border Grid.Column="0"
+                                Background="{StaticResource BrushSurfaceRaised}"
+                                CornerRadius="10,0,0,10"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="1,1,0,1">
+                            <PathIcon Data="{StaticResource IconDownload}"
+                                      Foreground="{StaticResource BrushTextSecondary}"
+                                      Width="15"
+                                      Height="15"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                        </Border>
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding OutputPath}"
+                                 PlaceholderText="{Binding LOutputPathPlaceholder}"
+                                 IsReadOnly="True"
+                                 CornerRadius="0,10,10,0"
+                                 Height="44"
+                                 VerticalContentAlignment="Center" />
+                    </Grid>
+                    <Button Grid.Column="1"
+                            Content="{Binding LBrowseOutput}"
+                            Command="{Binding BrowseOutputCommand}"
+                            IsEnabled="{Binding !IsBusy}"
+                            Classes="btn-cyber-outline"
+                            Height="44" />
+                </Grid>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

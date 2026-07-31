@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
+             x:Class="SmartInvoicePrintingTool.Views.Components.AppHeaderView"
+             x:DataType="vm:MainWindowViewModel">
+    <Border Padding="30,18"
+            Background="#F2121826"
+            BorderBrush="{StaticResource BrushBorder}"
+            BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="*,Auto">
+            <Grid Grid.Column="0" ColumnDefinitions="44,*" ColumnSpacing="14" VerticalAlignment="Center">
+                <Border Grid.Column="0"
+                        Width="44"
+                        Height="44"
+                        CornerRadius="12"
+                        Background="{StaticResource BrushPrimary}">
+                    <PathIcon Data="{StaticResource IconZap}"
+                              Foreground="White"
+                              Width="21"
+                              Height="21"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" />
+                </Border>
+
+                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                    <TextBlock Text="Smart Invoice Printing"
+                               FontSize="19"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource BrushTextPrimary}" />
+                    <TextBlock Text="{Binding LSubtitle}"
+                               MaxWidth="520"
+                               TextTrimming="CharacterEllipsis"
+                               FontSize="12.5"
+                               Foreground="{StaticResource BrushTextSecondary}" />
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <Border Background="#152B2730"
+                        CornerRadius="20"
+                        Padding="11,7"
+                        BorderBrush="#364D455B"
+                        BorderThickness="1">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Ellipse Width="7" Height="7" Fill="{StaticResource BrushSuccess}" />
+                        <TextBlock Text="{Binding LSystemReady}"
+                                   FontSize="11.5"
+                                   Foreground="#A7F3D0"
+                                   FontWeight="Medium" />
+                    </StackPanel>
+                </Border>
+
+                <Button Command="{Binding ToggleLanguageCommand}"
+                        Classes="btn-cyber-outline"
+                        MinWidth="112"
+                        Height="38"
+                        ToolTip.Tip="Switch Language / 切换界面语言">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <PathIcon Data="{StaticResource IconGlobe}"
+                                  Foreground="{StaticResource BrushTextSecondary}"
+                                  Width="15"
+                                  Height="15" />
+                        <TextBlock Text="{Binding LLangSwitchText}" FontSize="12.5" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

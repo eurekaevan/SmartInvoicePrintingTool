@@ -5,13 +5,12 @@ using Microsoft.Extensions.Logging;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using SmartInvoicePrintingTool.Services.Abstractions;
-using SmartInvoicePrintingTool.Utils;
 // 使用别名避开命名冲突
 using MyPdfMetadata = SmartInvoicePrintingTool.Models.PdfMetadata;
 
 namespace SmartInvoicePrintingTool.Services.Implementations;
 
-public sealed class PdfMetadataService : IPdfMetadataService, IDisposable
+public sealed class PdfMetadataService : IPdfMetadataService
 {
     private readonly ILogger<PdfMetadataService> _logger;
 
@@ -51,7 +50,7 @@ public sealed class PdfMetadataService : IPdfMetadataService, IDisposable
         catch (OperationCanceledException)
         {
             _logger.LogInformation("操作已取消: {Path}", pdfPath);
-            return null;
+            throw;
         }
         catch (Exception ex)
         {
@@ -63,6 +62,4 @@ public sealed class PdfMetadataService : IPdfMetadataService, IDisposable
             document?.Close();
         }
     }
-
-    public void Dispose() { }
 }

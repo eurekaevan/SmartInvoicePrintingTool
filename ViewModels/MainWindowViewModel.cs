@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Logging;
 using SmartInvoicePrintingTool.Services.Abstractions;
 
 namespace SmartInvoicePrintingTool.ViewModels;
 
-public partial class MainWindowViewModel : ViewModelBase
+public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     public Func<string, Task<string?>>? SelectFolder { get; set; }
     private readonly IProcessingOrchestrator _orchestrator;
     private readonly IPdfPrintingService _printingService;
     private readonly ILogSink _logSink;
-    private readonly ILogger<MainWindowViewModel> _logger;
     private CancellationTokenSource? _cts;
+    private bool _isInitialized;
+    private bool _isDisposed;
 
     [ObservableProperty] private bool _isCancellable;
     [ObservableProperty] private bool _isBusy;
@@ -39,7 +40,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     // 国际化 i18n 属性字典
     public string LSubtitle => IsEnglish ? "Batch Invoice Recognition & Smart Printing Control Center" : "智能发票批量识别合并 • 自动版面精印控制中枢";
-    public string LSystemReady => IsEnglish ? "SYSTEM READY" : "系统就绪";
+    public string LSystemReady => IsBusy
+        ? (IsEnglish ? "PROCESSING" : "处理中")
+        : (IsEnglish ? "SYSTEM READY" : "系统就绪");
     public string LDirConfig => IsEnglish ? "Directory Setup" : "目录路由配置";
     public string LSourcePathLabel => IsEnglish ? "Source Invoice PDF Directory" : "源发票 PDF 包含目录";
     public string LSourcePathPlaceholder => IsEnglish ? "Click button on right to pick source folder..." : "点击右侧按钮选择发票源目录...";
@@ -55,7 +58,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public string LTerminalLog => IsEnglish ? "TERMINAL LOG MONITOR" : "实时控制台日志";
     public string LClearLog => IsEnglish ? "CLEAR" : "清空";
     public string LLangSwitchText => IsEnglish ? "🌐 中文" : "🌐 English";
-    
+
     // 打印机相关
     public ObservableCollection<string> Printers { get; } = new();
     [ObservableProperty] private string? _selectedPrinter;
@@ -63,38 +66,36 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel(
         IProcessingOrchestrator orchestrator,
         IPdfPrintingService printingService,
-        ILogSink logSink,
-        ILogger<MainWindowViewModel> logger)
+        ILogSink logSink)
     {
         _orchestrator = orchestrator;
         _printingService = printingService;
         _logSink = logSink;
-        _logger = logger;
 
-        // 1. 订阅日志事件
         _logSink.LogMessage += OnLogReceived;
-        LogMessage("系统启动成功");
-
-        // 2. 初始化后台加载打印机列表
-        Task.Run(LoadPrintersAsync);
     }
 
-    private async Task LoadPrintersAsync()
+    partial void OnIsBusyChanged(bool value) => OnPropertyChanged(nameof(LSystemReady));
+
+    public async Task InitializeAsync()
     {
+        if (_isInitialized || _isDisposed) return;
+        _isInitialized = true;
+
         try
         {
+            LogMessage("系统启动成功");
             var printers = await _printingService.GetAvailablePrintersAsync();
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Printers.Clear();
+            foreach (var printer in printers)
             {
-                Printers.Clear();
-                foreach (var p in printers)
-                {
-                    Printers.Add(p);
-                }
+                Printers.Add(printer);
+            }
 
-                if (Printers.Count > 0)
-                    SelectedPrinter = Printers[0]; // 默认选中第一个
-            });
+            if (Printers.Count > 0)
+                SelectedPrinter = Printers[0];
+            else
+                LogMessage("未检测到可用打印机");
         }
         catch (Exception ex)
         {
@@ -140,16 +141,36 @@ public partial class MainWindowViewModel : ViewModelBase
             StatusMessage = IsEnglish ? "❌ Please select a valid output PDF directory first!" : "❌ 请先选择有效的输出 PDF 目录！";
             return;
         }
-        
-        _cts = new CancellationTokenSource();
+
+        if (PathsEqual(SourcePath, OutputPath))
+        {
+            StatusMessage = IsEnglish ? "❌ Source and output directories cannot be the same!" : "❌ 源目录和输出目录不能相同！";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(SelectedPrinter))
+        {
+            StatusMessage = IsEnglish ? "❌ Please select an available printer first!" : "❌ 请先选择可用的打印机！";
+            return;
+        }
+
+        var cts = new CancellationTokenSource();
+        _cts = cts;
         IsBusy = true;
         IsCancellable = true;
+        ProgressValue = 0;
         StatusMessage = IsEnglish ? "Processing... (Click stop to cancel)" : "正在处理中... (点击停止可取消)";
 
         try
         {
-            await _orchestrator.ProcessAsync(SourcePath, OutputPath, new Progress<double>(p => ProgressValue = p * 100), _cts.Token);
-            StatusMessage = IsEnglish ? "✅ Processing Completed!" : "✅ 处理完成！";
+            var result = await _orchestrator.ProcessAsync(
+                SourcePath,
+                OutputPath,
+                SelectedPrinter,
+                new Progress<double>(p => ProgressValue = p),
+                cts.Token);
+
+            StatusMessage = FormatResult(result);
         }
         catch (OperationCanceledException)
         {
@@ -163,12 +184,13 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             IsBusy = false;
             IsCancellable = false;
-            _cts?.Dispose();
+            if (ReferenceEquals(_cts, cts)) _cts = null;
+            cts.Dispose();
         }
     }
 
     [RelayCommand]
-    private async Task StopProcessing()
+    private void StopProcessing()
     {
         _cts?.Cancel();
         StatusMessage = IsEnglish ? "Stopping task..." : "正在停止任务...";
@@ -194,5 +216,41 @@ public partial class MainWindowViewModel : ViewModelBase
     private void LogMessage(string msg)
     {
         _logSink.Log(msg);
+    }
+
+    private string FormatResult(Models.ProcessingResult result)
+    {
+        if (result.InputCount == 0)
+            return IsEnglish ? "ℹ No PDF files found" : "ℹ 未找到 PDF 文件";
+        if (result.PairCount == 0)
+            return IsEnglish ? "ℹ No mergeable PDF pairs found" : "ℹ 未找到可合并的 PDF 配对";
+        if (result.HasFailures)
+        {
+            return IsEnglish
+                ? $"⚠ Completed with failures: merged {result.MergeSucceeded}, printed {result.PrintSubmitted}"
+                : $"⚠ 处理完成但有失败：合并 {result.MergeSucceeded}，已提交打印 {result.PrintSubmitted}";
+        }
+
+        return IsEnglish
+            ? $"✅ Completed: {result.MergeSucceeded} merged and submitted for printing"
+            : $"✅ 处理完成：合并并提交打印 {result.MergeSucceeded} 份";
+    }
+
+    private static bool PathsEqual(string first, string second)
+    {
+        var firstPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(first));
+        var secondPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(second));
+        return string.Equals(firstPath, secondPath, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed) return;
+        _isDisposed = true;
+        _logSink.LogMessage -= OnLogReceived;
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = null;
+        GC.SuppressFinalize(this);
     }
 }

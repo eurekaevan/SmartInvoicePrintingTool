@@ -38,43 +38,51 @@ public sealed class PdfPrintingService : IPdfPrintingService
 
     public Task<bool> PrintAsync(string pdfPath, string printerName, CancellationToken ct = default)
     {
-        return Task.Run(() =>
+        ct.ThrowIfCancellationRequested();
+
+        if (!File.Exists(pdfPath))
         {
-            ct.ThrowIfCancellationRequested();
+            _logger.LogError("待打印 PDF 不存在: {File}", pdfPath);
+            return Task.FromResult(false);
+        }
 
-            try
+        if (string.IsNullOrWhiteSpace(printerName))
+        {
+            _logger.LogError("未指定打印机: {File}", pdfPath);
+            return Task.FromResult(false);
+        }
+
+        try
+        {
+            // printto 会把目标打印机传给系统关联的 PDF 阅读器。
+            // 成功仅表示任务已交给关联程序，不代表物理打印已经完成。
+            var psi = new ProcessStartInfo
             {
-                // 使用 Windows ShellExecute 机制调用关联的 PDF 程序打印
-                // 这种方式最通用，只要系统装了 PDF 阅读器即可打印
-                var psi = new ProcessStartInfo
-                {
-                    FileName = pdfPath,
-                    Verb = "print", // 触发"打印"动作；若想指定打印机，部分程序支持 Arguments = printerName 且 Verb="printto"
-                    CreateNoWindow = true,
-                    UseShellExecute = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
+                FileName = pdfPath,
+                Verb = "printto",
+                CreateNoWindow = true,
+                UseShellExecute = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            psi.ArgumentList.Add(printerName);
 
-                using var process = Process.Start(psi);
-                
-                if (process == null)
-                {
-                    _logger.LogError("无法启动打印进程: {File}", pdfPath);
-                    return false;
-                }
-
-                // 等待打印完成（或超时）
-                // 注意：某些现代 PDF 阅读器（如 Edge）是异步处理打印的，启动即返回
-                process.WaitForExit(5000);
-                
-                _logger.LogInformation("已发送打印任务: {File}", Path.GetFileName(pdfPath));
-                return true;
-            }
-            catch (Exception ex)
+            using var process = Process.Start(psi);
+            if (process == null)
             {
-                _logger.LogError(ex, "打印任务发送失败: {File}", pdfPath);
-                return false;
+                _logger.LogError("无法启动打印进程: {File}", pdfPath);
+                return Task.FromResult(false);
             }
-        }, ct);
+
+            _logger.LogInformation(
+                "已将打印任务提交给关联程序: {File} -> {Printer}",
+                Path.GetFileName(pdfPath),
+                printerName);
+            return Task.FromResult(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "打印任务提交失败: {File} -> {Printer}", pdfPath, printerName);
+            return Task.FromResult(false);
+        }
     }
 }

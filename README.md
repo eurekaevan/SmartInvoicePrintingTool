@@ -46,7 +46,8 @@ SmartInvoicePrintingTool/
 │   ├── ViewModelBase.cs           # ViewModel 抽象基类
 │   └── MainWindowViewModel.cs     # 主界面 ViewModel (状态控制、i18n 字典、Command)
 ├── Views/                         # XAML 视图层
-│   ├── MainWindow.axaml           # 赛博双栏网格主界面
+│   ├── Components/                # 顶栏、目录、状态、打印与日志独立面板
+│   ├── MainWindow.axaml           # 背景与双栏仪表盘布局
 │   └── MainWindow.axaml.cs        # 视图后台代码 (安全对话框绑定)
 ├── Utils/                         # 工具辅助类
 │   ├── SafeFileDialogs.cs         # 现代 StorageProvider 文件夹选择器
@@ -89,12 +90,20 @@ SmartInvoicePrintingTool/
 1. **配置源与输出目录**：
    - 点击 **“浏览源目录”** 选择存有发票 PDF 的文件夹。
    - 点击 **“浏览输出目录”** 选择合并后生成的 PDF 保存位置。
+   - 源目录与输出目录必须不同；已有同名结果不会被覆盖，程序会自动追加序号。
 2. **选择目标打印设备**：
    - 从 **“目标打印设备选择”** 下拉菜单中选择目标物理或虚拟打印机。
 3. **语言切换（可选）**：
    - 点击顶栏右侧 **`🌐 English / 🌐 中文`** 按键，随心切换界面语言。
 4. **开始合并与打印**：
    - 点击 **`▶ 开始合并并打印`** 主控制按钮，系统自动开始扫描、配对、计算缩放比、合并 PDF，并在 Terminal 控制台中实时输出日志。
+   - “已提交打印”表示任务已交给 Windows 关联的 PDF 阅读器，不代表物理打印已经完成。
+
+### 自动化验证
+
+```bash
+dotnet test tests/SmartInvoicePrintingTool.Tests/SmartInvoicePrintingTool.Tests.csproj
+```
 
 ---
 

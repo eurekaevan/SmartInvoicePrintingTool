@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
+             x:Class="SmartInvoicePrintingTool.Views.Components.ProcessingStatusView"
+             x:DataType="vm:MainWindowViewModel">
+    <Border Classes="cyber-card" Padding="24,21">
+        <StackPanel Spacing="14">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="{Binding LStatusLabel}"
+                               FontSize="11"
+                               Foreground="{StaticResource BrushTextMuted}"
+                               FontWeight="SemiBold"
+                               LetterSpacing="0.8" />
+                    <TextBlock Text="{Binding StatusMessage}"
+                               FontSize="14"
+                               Foreground="{StaticResource BrushTextPrimary}"
+                               FontWeight="Medium"
+                               TextWrapping="Wrap"
+                               MaxLines="2" />
+                </StackPanel>
+
+                <Border Grid.Column="1"
+                        Background="#1A6D5EF7"
+                        BorderBrush="#356D5EF7"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Padding="11,6"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="{Binding ProgressValue, StringFormat='{}{0:F0}%'}"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="#C9C5FF" />
+                </Border>
+            </Grid>
+
+            <ProgressBar Value="{Binding ProgressValue}"
+                         Minimum="0"
+                         Maximum="100"
+                         Height="7"
+                         CornerRadius="4"
+                         Background="{StaticResource BrushInput}"
+                         Foreground="{StaticResource BrushPrimary}" />
+        </StackPanel>
+    </Border>
+</UserControl>

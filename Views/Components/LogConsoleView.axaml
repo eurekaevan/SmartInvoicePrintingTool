@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
+             x:Class="SmartInvoicePrintingTool.Views.Components.LogConsoleView"
+             x:DataType="vm:MainWindowViewModel">
+    <Border Classes="cyber-card" Padding="0">
+        <Grid RowDefinitions="Auto,*">
+            <Border Grid.Row="0"
+                    Background="{StaticResource BrushSurfaceRaised}"
+                    Padding="18,13"
+                    CornerRadius="16,16,0,0"
+                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderThickness="0,0,0,1">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
+                        <Border Width="28" Height="28" CornerRadius="8" Background="#1734D399">
+                            <PathIcon Data="{StaticResource IconTerminal}"
+                                      Foreground="{StaticResource BrushSuccess}"
+                                      Width="14"
+                                      Height="14"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="{Binding LTerminalLog}"
+                                   FontWeight="SemiBold"
+                                   FontSize="12"
+                                   Foreground="{StaticResource BrushTextPrimary}" />
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Command="{Binding ClearLogCommand}"
+                            Classes="btn-icon"
+                            ToolTip.Tip="Clear Console Logs">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <PathIcon Data="{StaticResource IconTrash}"
+                                      Foreground="{StaticResource BrushTextSecondary}"
+                                      Width="13"
+                                      Height="13" />
+                            <TextBlock Text="{Binding LClearLog}" FontSize="11.5" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <TextBox Grid.Row="1"
+                     Text="{Binding LogContent, Mode=OneWay}"
+                     IsReadOnly="True"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     MinHeight="218"
+                     BorderThickness="0"
+                     CornerRadius="0,0,16,16"
+                     Padding="18,15"
+                     Background="#0A101A"
+                     Foreground="#A7B7CB"
+                     FontFamily="Consolas, Fira Code, Monaco, monospace"
+                     FontSize="12"
+                     LineHeight="18"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto" />
+        </Grid>
+    </Border>
+</UserControl>

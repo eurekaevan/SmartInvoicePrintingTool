@@ -7,8 +7,8 @@ namespace SmartInvoicePrintingTool.Services.Abstractions;
 
 public interface IProcessingOrchestrator
 {
-    Task ProcessAsync(
-        string sourceFolder, string outputFolder,
+    Task<ProcessingResult> ProcessAsync(
+        string sourceFolder, string outputFolder, string printerName,
         IProgress<double>? progress = null,
         CancellationToken ct = default);
 }
