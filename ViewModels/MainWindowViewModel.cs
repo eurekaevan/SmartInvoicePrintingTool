@@ -29,35 +29,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private string _outputPath = string.Empty;
 
     [ObservableProperty] private string _logContent = string.Empty;
-    [ObservableProperty] private bool _isEnglish;
-
-    [RelayCommand]
-    private void ToggleLanguage()
-    {
-        IsEnglish = !IsEnglish;
-        OnPropertyChanged(string.Empty);
-    }
-
-    // 国际化 i18n 属性字典
-    public string LSubtitle => IsEnglish ? "Batch Invoice Recognition & Smart Printing Control Center" : "智能发票批量识别合并 • 自动版面精印控制中枢";
-    public string LSystemReady => IsBusy
-        ? (IsEnglish ? "PROCESSING" : "处理中")
-        : (IsEnglish ? "SYSTEM READY" : "系统就绪");
-    public string LDirConfig => IsEnglish ? "Directory Setup" : "目录路由配置";
-    public string LSourcePathLabel => IsEnglish ? "Source Invoice PDF Directory" : "源发票 PDF 包含目录";
-    public string LSourcePathPlaceholder => IsEnglish ? "Click button on right to pick source folder..." : "点击右侧按钮选择发票源目录...";
-    public string LBrowseSource => IsEnglish ? "Browse Source" : "浏览源目录";
-    public string LOutputPathLabel => IsEnglish ? "Processed PDF Output Directory" : "处理完成 PDF 输出目录";
-    public string LOutputPathPlaceholder => IsEnglish ? "Click button on right to pick output folder..." : "点击右侧按钮选择生成结果保存目录...";
-    public string LBrowseOutput => IsEnglish ? "Browse Output" : "浏览输出目录";
-    public string LPrinterSelect => IsEnglish ? "Target Printer Selection" : "目标打印设备选择";
-    public string LPrinterPlaceholder => IsEnglish ? "Select printer device..." : "选择打印机设备...";
-    public string LStartPrint => IsEnglish ? "Start Merge & Print" : "开始合并并打印";
-    public string LForceStop => IsEnglish ? "Force Stop" : "强制终止";
-    public string LStatusLabel => IsEnglish ? "Status:" : "执行状态:";
-    public string LTerminalLog => IsEnglish ? "TERMINAL LOG MONITOR" : "实时控制台日志";
-    public string LClearLog => IsEnglish ? "CLEAR" : "清空";
-    public string LLangSwitchText => IsEnglish ? "🌐 中文" : "🌐 English";
+    public string SystemStatusText => IsBusy ? "正在处理" : "系统就绪";
 
     // 打印机相关
     public ObservableCollection<string> Printers { get; } = new();
@@ -75,7 +47,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _logSink.LogMessage += OnLogReceived;
     }
 
-    partial void OnIsBusyChanged(bool value) => OnPropertyChanged(nameof(LSystemReady));
+    partial void OnIsBusyChanged(bool value) => OnPropertyChanged(nameof(SystemStatusText));
 
     public async Task InitializeAsync()
     {
@@ -108,8 +80,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         if (SelectFolder != null)
         {
-            var title = IsEnglish ? "Select Source PDF Folder" : "请选择源 PDF 文件夹";
-            var path = await SelectFolder(title);
+            var path = await SelectFolder("请选择源 PDF 文件夹");
             if (path != null) SourcePath = path;
         }
     }
@@ -119,8 +90,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         if (SelectFolder != null)
         {
-            var title = IsEnglish ? "Select Output PDF Folder" : "请选择输出 PDF 文件夹";
-            var path = await SelectFolder(title);
+            var path = await SelectFolder("请选择输出 PDF 文件夹");
             if (path != null) OutputPath = path;
         }
     }
@@ -132,25 +102,25 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         if (string.IsNullOrWhiteSpace(SourcePath) || !System.IO.Directory.Exists(SourcePath))
         {
-            StatusMessage = IsEnglish ? "❌ Please select a valid source PDF directory first!" : "❌ 请先选择有效的源 PDF 目录！";
+            StatusMessage = "请先选择有效的源 PDF 目录。";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(OutputPath) || !System.IO.Directory.Exists(OutputPath))
         {
-            StatusMessage = IsEnglish ? "❌ Please select a valid output PDF directory first!" : "❌ 请先选择有效的输出 PDF 目录！";
+            StatusMessage = "请先选择有效的输出 PDF 目录。";
             return;
         }
 
         if (PathsEqual(SourcePath, OutputPath))
         {
-            StatusMessage = IsEnglish ? "❌ Source and output directories cannot be the same!" : "❌ 源目录和输出目录不能相同！";
+            StatusMessage = "源目录和输出目录不能相同。";
             return;
         }
 
         if (string.IsNullOrWhiteSpace(SelectedPrinter))
         {
-            StatusMessage = IsEnglish ? "❌ Please select an available printer first!" : "❌ 请先选择可用的打印机！";
+            StatusMessage = "请先选择可用的打印机。";
             return;
         }
 
@@ -159,7 +129,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         IsBusy = true;
         IsCancellable = true;
         ProgressValue = 0;
-        StatusMessage = IsEnglish ? "Processing... (Click stop to cancel)" : "正在处理中... (点击停止可取消)";
+        StatusMessage = "正在处理，可点击“停止当前任务”取消。";
 
         try
         {
@@ -174,11 +144,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
         catch (OperationCanceledException)
         {
-            StatusMessage = IsEnglish ? "⏹ Task Stopped" : "⏹ 已停止任务";
+            StatusMessage = "任务已停止。";
         }
         catch (Exception ex)
         {
-            StatusMessage = IsEnglish ? $"❌ Error: {ex.Message}" : $"❌ 错误: {ex.Message}";
+            StatusMessage = $"处理失败：{ex.Message}";
         }
         finally
         {
@@ -193,7 +163,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private void StopProcessing()
     {
         _cts?.Cancel();
-        StatusMessage = IsEnglish ? "Stopping task..." : "正在停止任务...";
+        StatusMessage = "正在停止任务…";
     }
 
     [RelayCommand]
@@ -221,19 +191,15 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private string FormatResult(Models.ProcessingResult result)
     {
         if (result.InputCount == 0)
-            return IsEnglish ? "ℹ No PDF files found" : "ℹ 未找到 PDF 文件";
+            return "未找到 PDF 文件。";
         if (result.PairCount == 0)
-            return IsEnglish ? "ℹ No mergeable PDF pairs found" : "ℹ 未找到可合并的 PDF 配对";
+            return "未找到可合并的 PDF 配对。";
         if (result.HasFailures)
         {
-            return IsEnglish
-                ? $"⚠ Completed with failures: merged {result.MergeSucceeded}, printed {result.PrintSubmitted}"
-                : $"⚠ 处理完成但有失败：合并 {result.MergeSucceeded}，已提交打印 {result.PrintSubmitted}";
+            return $"处理完成但有部分失败：成功合并 {result.MergeSucceeded} 份，已提交打印 {result.PrintSubmitted} 份。";
         }
 
-        return IsEnglish
-            ? $"✅ Completed: {result.MergeSucceeded} merged and submitted for printing"
-            : $"✅ 处理完成：合并并提交打印 {result.MergeSucceeded} 份";
+        return $"处理完成：已合并并提交打印 {result.MergeSucceeded} 份。";
     }
 
     private static bool PathsEqual(string first, string second)

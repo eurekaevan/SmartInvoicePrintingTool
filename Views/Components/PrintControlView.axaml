@@ -3,58 +3,65 @@
              xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
              x:Class="SmartInvoicePrintingTool.Views.Components.PrintControlView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="cyber-card">
-        <StackPanel Spacing="20">
+    <Border Classes="material-card">
+        <StackPanel Spacing="22">
             <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
-                    <Border Classes="icon-tile">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14">
+                    <Border Classes="icon-container" Background="#D9E7CB">
                         <PathIcon Data="{StaticResource IconPrinter}"
                                   Foreground="{StaticResource BrushAccent}"
-                                  Width="17"
-                                  Height="17"
+                                  Width="20"
+                                  Height="20"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Center" />
                     </Border>
-                    <StackPanel Spacing="2" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding LPrinterSelect}" Classes="section-title" />
-                        <TextBlock Text="DEVICE &amp; ACTION" FontSize="10" Foreground="{StaticResource BrushTextMuted}" LetterSpacing="1" />
+                    <StackPanel Spacing="3" VerticalAlignment="Center">
+                        <TextBlock Text="打印设置" Classes="section-title" />
+                        <TextBlock Text="选择打印设备并开始处理任务" Classes="supporting-text" />
                     </StackPanel>
                 </StackPanel>
+
                 <Border Grid.Column="1"
-                        Background="#174CC9F0"
-                        CornerRadius="12"
-                        Padding="9,4"
+                        Background="#D9E7CB"
+                        CornerRadius="14"
+                        Padding="12,6"
                         VerticalAlignment="Center">
-                    <TextBlock Text="STEP 02" FontSize="10" FontWeight="SemiBold" Foreground="#A5E9FA" LetterSpacing="0.7" />
+                    <TextBlock Text="第 2 步"
+                               FontSize="11.5"
+                               FontWeight="SemiBold"
+                               Foreground="#173807" />
                 </Border>
             </Grid>
 
-            <ComboBox ItemsSource="{Binding Printers}"
-                      SelectedItem="{Binding SelectedPrinter}"
-                      PlaceholderText="{Binding LPrinterPlaceholder}"
-                      IsEnabled="{Binding !IsBusy}"
-                      HorizontalAlignment="Stretch"
-                      MinHeight="44" />
+            <StackPanel Spacing="9">
+                <TextBlock Text="目标打印机" Classes="field-label" />
+                <ComboBox ItemsSource="{Binding Printers}"
+                          SelectedItem="{Binding SelectedPrinter}"
+                          PlaceholderText="请选择可用的打印设备"
+                          IsEnabled="{Binding !IsBusy}"
+                          HorizontalAlignment="Stretch"
+                          MinHeight="48" />
+            </StackPanel>
 
             <Button Command="{Binding StartProcessingCommand}"
                     IsEnabled="{Binding !IsBusy}"
-                    Classes="btn-cyber-primary"
-                    Height="48"
+                    Classes="material-filled"
+                    Height="52"
                     HorizontalAlignment="Stretch">
-                <StackPanel Orientation="Horizontal" Spacing="9">
-                    <PathIcon Data="{StaticResource IconPlay}" Foreground="White" Width="17" Height="17" />
-                    <TextBlock Text="{Binding LStartPrint}" FontSize="14" FontWeight="SemiBold" />
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <PathIcon Data="{StaticResource IconPlay}" Foreground="White" Width="18" Height="18" />
+                    <TextBlock Text="开始合并并打印" FontSize="14" FontWeight="SemiBold" />
                 </StackPanel>
             </Button>
 
             <Button Command="{Binding StopProcessingCommand}"
                     IsEnabled="{Binding IsCancellable}"
-                    Classes="btn-cyber-danger"
-                    Height="42"
+                    Classes="material-danger"
+                    Height="44"
                     HorizontalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <PathIcon Data="{StaticResource IconStop}" Foreground="{StaticResource BrushDanger}" Width="15" Height="15" />
-                    <TextBlock Text="{Binding LForceStop}" />
+                    <TextBlock Text="停止当前任务" />
                 </StackPanel>
             </Button>
         </StackPanel>

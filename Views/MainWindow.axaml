@@ -4,7 +4,7 @@
         xmlns:components="using:SmartInvoicePrintingTool.Views.Components"
         x:Class="SmartInvoicePrintingTool.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="Smart Invoice Printing Tool - 智能发票打印控制终端"
+        Title="智能发票合并打印工具"
         Icon="/Assets/logo.ico"
         Width="1160"
         Height="800"
@@ -18,51 +18,21 @@
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto,*">
-        <Border Grid.RowSpan="2" IsHitTestVisible="False">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                    <GradientStop Offset="0" Color="#0D1320" />
-                    <GradientStop Offset="0.55" Color="#0B0F19" />
-                    <GradientStop Offset="1" Color="#0A111B" />
-                </LinearGradientBrush>
-            </Border.Background>
-        </Border>
-
-        <Canvas Grid.RowSpan="2" IsHitTestVisible="False" ClipToBounds="True">
-            <Ellipse Width="620" Height="620" Canvas.Right="-260" Canvas.Top="-300" Opacity="0.055">
-                <Ellipse.Fill>
-                    <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%">
-                        <GradientStop Offset="0" Color="#6D5EF7" />
-                        <GradientStop Offset="1" Color="#00000000" />
-                    </RadialGradientBrush>
-                </Ellipse.Fill>
-            </Ellipse>
-
-            <Ellipse Width="520" Height="520" Canvas.Left="-180" Canvas.Bottom="-260" Opacity="0.04">
-                <Ellipse.Fill>
-                    <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%">
-                        <GradientStop Offset="0" Color="#4CC9F0" />
-                        <GradientStop Offset="1" Color="#00000000" />
-                    </RadialGradientBrush>
-                </Ellipse.Fill>
-            </Ellipse>
-        </Canvas>
-
         <components:AppHeaderView Grid.Row="0" />
 
         <ScrollViewer Grid.Row="1"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
-            <Grid MaxWidth="1400"
-                  Margin="26"
+            <Grid MaxWidth="1320"
+                  Margin="28,24,28,32"
                   HorizontalAlignment="Stretch"
-                  ColumnDefinitions="62*,22,38*">
-                <StackPanel Grid.Column="0" Spacing="18">
+                  ColumnDefinitions="60*,24,40*">
+                <StackPanel Grid.Column="0" Spacing="20">
                     <components:DirectorySetupView />
                     <components:ProcessingStatusView />
                 </StackPanel>
 
-                <StackPanel Grid.Column="2" Spacing="18">
+                <StackPanel Grid.Column="2" Spacing="20">
                     <components:PrintControlView />
                     <components:LogConsoleView />
                 </StackPanel>

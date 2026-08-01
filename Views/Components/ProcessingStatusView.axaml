@@ -3,15 +3,14 @@
              xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
              x:Class="SmartInvoicePrintingTool.Views.Components.ProcessingStatusView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="cyber-card" Padding="24,21">
-        <StackPanel Spacing="14">
+    <Border Classes="material-card" Padding="24,21">
+        <StackPanel Spacing="16">
             <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Grid.Column="0" Spacing="4">
-                    <TextBlock Text="{Binding LStatusLabel}"
-                               FontSize="11"
+                <StackPanel Grid.Column="0" Spacing="5">
+                    <TextBlock Text="处理进度"
+                               FontSize="12"
                                Foreground="{StaticResource BrushTextMuted}"
-                               FontWeight="SemiBold"
-                               LetterSpacing="0.8" />
+                               FontWeight="Medium" />
                     <TextBlock Text="{Binding StatusMessage}"
                                FontSize="14"
                                Foreground="{StaticResource BrushTextPrimary}"
@@ -21,25 +20,23 @@
                 </StackPanel>
 
                 <Border Grid.Column="1"
-                        Background="#1A6D5EF7"
-                        BorderBrush="#356D5EF7"
-                        BorderThickness="1"
-                        CornerRadius="10"
-                        Padding="11,6"
+                        Background="{StaticResource BrushPrimaryContainer}"
+                        CornerRadius="16"
+                        Padding="13,7"
                         VerticalAlignment="Center">
                     <TextBlock Text="{Binding ProgressValue, StringFormat='{}{0:F0}%'}"
                                FontSize="13"
                                FontWeight="SemiBold"
-                               Foreground="#C9C5FF" />
+                               Foreground="{StaticResource BrushOnPrimaryContainer}" />
                 </Border>
             </Grid>
 
             <ProgressBar Value="{Binding ProgressValue}"
                          Minimum="0"
                          Maximum="100"
-                         Height="7"
+                         Height="8"
                          CornerRadius="4"
-                         Background="{StaticResource BrushInput}"
+                         Background="{StaticResource BrushSurfaceRaised}"
                          Foreground="{StaticResource BrushPrimary}" />
         </StackPanel>
     </Border>

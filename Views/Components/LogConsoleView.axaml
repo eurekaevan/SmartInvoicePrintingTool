@@ -3,40 +3,43 @@
              xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
              x:Class="SmartInvoicePrintingTool.Views.Components.LogConsoleView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="cyber-card" Padding="0">
+    <Border Classes="material-card" Padding="0">
         <Grid RowDefinitions="Auto,*">
             <Border Grid.Row="0"
                     Background="{StaticResource BrushSurfaceRaised}"
                     Padding="18,13"
                     CornerRadius="16,16,0,0"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderBrush="#1F79747E"
                     BorderThickness="0,0,0,1">
                 <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
-                        <Border Width="28" Height="28" CornerRadius="8" Background="#1734D399">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Border Width="32" Height="32" CornerRadius="10" Background="{StaticResource BrushPrimaryContainer}">
                             <PathIcon Data="{StaticResource IconTerminal}"
-                                      Foreground="{StaticResource BrushSuccess}"
-                                      Width="14"
-                                      Height="14"
+                                      Foreground="{StaticResource BrushPrimary}"
+                                      Width="15"
+                                      Height="15"
                                       HorizontalAlignment="Center"
                                       VerticalAlignment="Center" />
                         </Border>
-                        <TextBlock Text="{Binding LTerminalLog}"
-                                   FontWeight="SemiBold"
-                                   FontSize="12"
-                                   Foreground="{StaticResource BrushTextPrimary}" />
+                        <StackPanel Spacing="1" VerticalAlignment="Center">
+                            <TextBlock Text="处理日志"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
+                                       Foreground="{StaticResource BrushTextPrimary}" />
+                            <TextBlock Text="显示最近的任务运行记录" Classes="supporting-text" FontSize="11" />
+                        </StackPanel>
                     </StackPanel>
 
                     <Button Grid.Column="1"
                             Command="{Binding ClearLogCommand}"
-                            Classes="btn-icon"
-                            ToolTip.Tip="Clear Console Logs">
-                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            Classes="material-text"
+                            ToolTip.Tip="清空处理日志">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
                             <PathIcon Data="{StaticResource IconTrash}"
-                                      Foreground="{StaticResource BrushTextSecondary}"
-                                      Width="13"
-                                      Height="13" />
-                            <TextBlock Text="{Binding LClearLog}" FontSize="11.5" />
+                                      Foreground="{StaticResource BrushPrimary}"
+                                      Width="14"
+                                      Height="14" />
+                            <TextBlock Text="清空" FontSize="12" />
                         </StackPanel>
                     </Button>
                 </Grid>
@@ -47,15 +50,15 @@
                      IsReadOnly="True"
                      AcceptsReturn="True"
                      TextWrapping="Wrap"
-                     MinHeight="218"
+                     MinHeight="210"
                      BorderThickness="0"
                      CornerRadius="0,0,16,16"
                      Padding="18,15"
-                     Background="#0A101A"
-                     Foreground="#A7B7CB"
-                     FontFamily="Consolas, Fira Code, Monaco, monospace"
+                     Background="{StaticResource BrushSurface}"
+                     Foreground="{StaticResource BrushTextSecondary}"
+                     FontFamily="Microsoft YaHei UI, Microsoft YaHei, Noto Sans CJK SC, sans-serif"
                      FontSize="12"
-                     LineHeight="18"
+                     LineHeight="19"
                      ScrollViewer.VerticalScrollBarVisibility="Auto" />
         </Grid>
     </Border>
