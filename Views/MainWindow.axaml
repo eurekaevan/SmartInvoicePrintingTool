@@ -4,14 +4,14 @@
         xmlns:components="using:SmartInvoicePrintingTool.Views.Components"
         x:Class="SmartInvoicePrintingTool.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="智能发票合并打印工具"
+        Title="智能发票处理工作台"
         Icon="/Assets/logo.ico"
-        Width="1160"
-        Height="800"
-        MinWidth="900"
-        MinHeight="650"
+        Width="1240"
+        Height="860"
+        MinWidth="960"
+        MinHeight="700"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BrushWindow}">
+        Background="{StaticResource BrushCanvas}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
@@ -20,26 +20,55 @@
     <Grid RowDefinitions="Auto,*">
         <components:AppHeaderView Grid.Row="0" />
 
+        <!-- 页面只保留这一个主滚动区，合并结果和运行日志均随页面滚动。 -->
         <ScrollViewer Grid.Row="1"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
-            <StackPanel MaxWidth="1320"
-                        Margin="28,24,28,32"
+            <StackPanel MaxWidth="1380"
+                        Margin="32,28,32,40"
                         HorizontalAlignment="Stretch"
-                        Spacing="20">
-                <Grid ColumnDefinitions="60*,24,40*">
-                    <StackPanel Grid.Column="0" Spacing="20">
-                        <components:DirectorySetupView />
-                        <components:ProcessingStatusView />
-                    </StackPanel>
+                        Spacing="16">
+                <Border Background="{StaticResource BrushHeader}"
+                        CornerRadius="10"
+                        Padding="26,22">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <TextBlock Text="PDF 批量生产流程"
+                                       FontSize="23"
+                                       FontWeight="SemiBold"
+                                       Foreground="White" />
+                            <TextBlock Text="按顺序完成目录配置、文件合并、结果核对与打印提交。"
+                                       FontSize="12.5"
+                                       Foreground="#B7C2D2"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
 
-                    <StackPanel Grid.Column="2" Spacing="20">
-                        <components:PrintControlView />
-                        <components:LogConsoleView />
-                    </StackPanel>
-                </Grid>
+                        <Border Grid.Column="1"
+                                Background="#162457D6"
+                                BorderBrush="#486FD9"
+                                BorderThickness="1"
+                                CornerRadius="7"
+                                Padding="13,9"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="合并结果确认后才会提交打印"
+                                       FontSize="11.5"
+                                       FontWeight="Medium"
+                                       Foreground="#DCE6FF" />
+                        </Border>
+                    </Grid>
+                </Border>
 
+                <components:DirectorySetupView />
+                <components:PrintControlView />
+                <components:ProcessingStatusView />
                 <components:MergeResultsView />
+                <components:LogConsoleView />
+
+                <TextBlock Text="注意：“已提交打印”表示任务已交给 Windows 关联的 PDF 程序，不代表已确认物理出纸。"
+                           Margin="4,2"
+                           TextWrapping="Wrap"
+                           FontSize="11.5"
+                           Foreground="{StaticResource BrushInkMuted}" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

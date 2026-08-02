@@ -4,113 +4,119 @@
              xmlns:models="using:SmartInvoicePrintingTool.Models"
              x:Class="SmartInvoicePrintingTool.Views.Components.MergeResultsView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="material-card" Padding="0">
-        <Grid RowDefinitions="Auto,*">
-            <Border Grid.Row="0"
-                    Background="{StaticResource BrushSurfaceRaised}"
-                    Padding="22,15"
-                    CornerRadius="16,16,0,0"
-                    BorderBrush="#1F79747E"
+    <Border Classes="workspace-card" Padding="0">
+        <StackPanel>
+            <Border Padding="24,20"
+                    BorderBrush="{StaticResource BrushLine}"
                     BorderThickness="0,0,0,1">
                 <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
-                        <Border Width="36"
-                                Height="36"
-                                CornerRadius="11"
-                                Background="{StaticResource BrushSuccessContainer}">
-                            <PathIcon Data="{StaticResource IconCheck}"
-                                      Foreground="{StaticResource BrushSuccess}"
-                                      Width="17"
-                                      Height="17"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center" />
-                        </Border>
-                        <StackPanel Spacing="2" VerticalAlignment="Center">
-                            <TextBlock Text="合并结果"
-                                       FontWeight="SemiBold"
-                                       FontSize="15"
-                                       Foreground="{StaticResource BrushTextPrimary}" />
-                            <TextBlock Text="{Binding MergeSummaryText}"
-                                       Classes="supporting-text"
-                                       FontSize="11.5" />
-                        </StackPanel>
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="03  核对结果" Classes="section-kicker" />
+                        <TextBlock Text="合并文件清单" Classes="section-title" />
+                        <TextBlock Text="{Binding MergeSummaryText}"
+                                   Classes="body-muted" />
                     </StackPanel>
 
                     <Border Grid.Column="1"
                             IsVisible="{Binding HasMergeResults}"
-                            Background="{StaticResource BrushPrimaryContainer}"
-                            CornerRadius="14"
-                            Padding="12,6"
+                            Background="{StaticResource BrushSuccessSoft}"
+                            CornerRadius="6"
+                            Padding="12,7"
                             VerticalAlignment="Center">
-                        <TextBlock Text="{Binding SuccessfulMergeCount, StringFormat='{}{0} 份可打印'}"
-                                   FontSize="11.5"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource BrushOnPrimaryContainer}" />
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <PathIcon Data="{StaticResource IconCheck}"
+                                      Foreground="{StaticResource BrushSuccess}"
+                                      Width="14"
+                                      Height="14" />
+                            <TextBlock Text="{Binding SuccessfulMergeCount, StringFormat='{}{0} 份可打印'}"
+                                       FontSize="11.5"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushSuccess}" />
+                        </StackPanel>
                     </Border>
                 </Grid>
             </Border>
 
-            <Border Grid.Row="1"
-                    IsVisible="{Binding HasNoMergeResults}"
-                    Padding="24,30"
-                    CornerRadius="0,0,16,16">
-                <StackPanel HorizontalAlignment="Center" Spacing="7">
-                    <TextBlock Text="尚无合并结果"
-                               HorizontalAlignment="Center"
-                               FontSize="14"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextSecondary}" />
-                    <TextBlock Text="点击“开始合并”后，每组 PDF 的配对关系会显示在这里"
-                               TextAlignment="Center"
-                               TextWrapping="Wrap"
-                               Foreground="{StaticResource BrushTextMuted}"
-                               FontSize="12" />
-                </StackPanel>
+            <Border IsVisible="{Binding HasNoMergeResults}"
+                    Background="{StaticResource BrushSurfaceSubtle}"
+                    Padding="28,36"
+                    CornerRadius="0,0,10,10">
+                <Grid ColumnDefinitions="42,*" ColumnSpacing="14" HorizontalAlignment="Center">
+                    <Border Grid.Column="0"
+                            Width="42"
+                            Height="42"
+                            CornerRadius="8"
+                            Background="{StaticResource BrushBrandSoft}">
+                        <PathIcon Data="{StaticResource IconMerge}"
+                                  Foreground="{StaticResource BrushBrand}"
+                                  Width="18"
+                                  Height="18"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                        <TextBlock Text="等待合并结果"
+                                   FontSize="13.5"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushInkSecondary}" />
+                        <TextBlock Text="完成合并后，这里会逐组展示两个源文件与它们的输出文件。"
+                                   Classes="body-muted"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Grid>
             </Border>
 
-            <ScrollViewer Grid.Row="1"
-                          IsVisible="{Binding HasMergeResults}"
-                          MaxHeight="360"
-                          VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          Padding="18">
-                <ItemsControl ItemsSource="{Binding MergeResults}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Spacing="12" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="models:MergeItemResult">
-                            <Border Background="{StaticResource BrushSurfaceRaised}"
-                                    BorderBrush="#2679747E"
-                                    BorderThickness="1"
-                                    CornerRadius="12"
-                                    Padding="16,14">
-                                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+            <ItemsControl IsVisible="{Binding HasMergeResults}"
+                          ItemsSource="{Binding MergeResults}"
+                          Margin="18">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="10" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="models:MergeItemResult">
+                        <Border Background="{StaticResource BrushSurfaceSubtle}"
+                                BorderBrush="{StaticResource BrushLine}"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                            <Grid ColumnDefinitions="4,*">
+                                <Border Grid.Column="0"
+                                        IsVisible="{Binding IsSuccess}"
+                                        Background="{StaticResource BrushSuccess}"
+                                        CornerRadius="8,0,0,8" />
+                                <Border Grid.Column="0"
+                                        IsVisible="{Binding !IsSuccess}"
+                                        Background="{StaticResource BrushDanger}"
+                                        CornerRadius="8,0,0,8" />
+
+                                <Grid Grid.Column="1"
+                                      Margin="17,14"
+                                      RowDefinitions="Auto,Auto,Auto"
+                                      RowSpacing="11">
                                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
-                                        <TextBlock Text="PDF 文件配对"
-                                                   FontSize="11.5"
+                                        <TextBlock Text="源文件配对"
+                                                   FontSize="11"
                                                    FontWeight="SemiBold"
-                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                                   Foreground="{StaticResource BrushInkMuted}" />
 
                                         <Border Grid.Column="1"
                                                 IsVisible="{Binding IsSuccess}"
-                                                Background="{StaticResource BrushSuccessContainer}"
-                                                CornerRadius="10"
+                                                Background="{StaticResource BrushSuccessSoft}"
+                                                CornerRadius="5"
                                                 Padding="9,4">
                                             <TextBlock Text="{Binding StatusText}"
-                                                       FontSize="11"
+                                                       FontSize="10.5"
                                                        FontWeight="SemiBold"
                                                        Foreground="{StaticResource BrushSuccess}" />
                                         </Border>
                                         <Border Grid.Column="1"
                                                 IsVisible="{Binding !IsSuccess}"
-                                                Background="{StaticResource BrushDangerContainer}"
-                                                CornerRadius="10"
+                                                Background="{StaticResource BrushDangerSoft}"
+                                                CornerRadius="5"
                                                 Padding="9,4">
                                             <TextBlock Text="{Binding StatusText}"
-                                                       FontSize="11"
+                                                       FontSize="10.5"
                                                        FontWeight="SemiBold"
                                                        Foreground="{StaticResource BrushDanger}" />
                                         </Border>
@@ -119,85 +125,104 @@
                                     <Grid Grid.Row="1" ColumnDefinitions="*,34,*" ColumnSpacing="10">
                                         <Border Grid.Column="0"
                                                 Background="{StaticResource BrushSurface}"
-                                                CornerRadius="9"
-                                                Padding="13,10">
-                                            <StackPanel Spacing="4">
-                                                <TextBlock Text="文件 A"
-                                                           FontSize="10.5"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{StaticResource BrushPrimary}" />
-                                                <TextBlock Text="{Binding FirstFileName}"
-                                                           ToolTip.Tip="{Binding FirstFileName}"
-                                                           TextWrapping="Wrap"
-                                                           TextTrimming="CharacterEllipsis"
-                                                           MaxLines="2"
-                                                           FontSize="12.5"
-                                                           LineHeight="18"
-                                                           Foreground="{StaticResource BrushTextPrimary}" />
-                                            </StackPanel>
+                                                BorderBrush="{StaticResource BrushLine}"
+                                                BorderThickness="1"
+                                                CornerRadius="6"
+                                                Padding="12,9">
+                                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
+                                                <PathIcon Grid.Column="0"
+                                                          Data="{StaticResource IconFile}"
+                                                          Foreground="{StaticResource BrushBrand}"
+                                                          Width="14"
+                                                          Height="14"
+                                                          VerticalAlignment="Top"
+                                                          Margin="0,2,0,0" />
+                                                <StackPanel Grid.Column="1" Spacing="3">
+                                                    <TextBlock Text="文件 A" Classes="field-label" FontSize="10.5" />
+                                                    <TextBlock Text="{Binding FirstFileName}"
+                                                               ToolTip.Tip="{Binding FirstFileName}"
+                                                               TextWrapping="Wrap"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               MaxLines="2"
+                                                               FontSize="12.5"
+                                                               LineHeight="18"
+                                                               Foreground="{StaticResource BrushInk}" />
+                                                </StackPanel>
+                                            </Grid>
                                         </Border>
 
                                         <TextBlock Grid.Column="1"
                                                    Text="+"
                                                    HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
-                                                   FontSize="18"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{StaticResource BrushTextMuted}" />
+                                                   FontSize="17"
+                                                   Foreground="{StaticResource BrushInkMuted}" />
 
                                         <Border Grid.Column="2"
                                                 Background="{StaticResource BrushSurface}"
-                                                CornerRadius="9"
-                                                Padding="13,10">
-                                            <StackPanel Spacing="4">
-                                                <TextBlock Text="文件 B"
-                                                           FontSize="10.5"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{StaticResource BrushPrimary}" />
-                                                <TextBlock Text="{Binding SecondFileName}"
-                                                           ToolTip.Tip="{Binding SecondFileName}"
+                                                BorderBrush="{StaticResource BrushLine}"
+                                                BorderThickness="1"
+                                                CornerRadius="6"
+                                                Padding="12,9">
+                                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
+                                                <PathIcon Grid.Column="0"
+                                                          Data="{StaticResource IconFile}"
+                                                          Foreground="{StaticResource BrushBrand}"
+                                                          Width="14"
+                                                          Height="14"
+                                                          VerticalAlignment="Top"
+                                                          Margin="0,2,0,0" />
+                                                <StackPanel Grid.Column="1" Spacing="3">
+                                                    <TextBlock Text="文件 B" Classes="field-label" FontSize="10.5" />
+                                                    <TextBlock Text="{Binding SecondFileName}"
+                                                               ToolTip.Tip="{Binding SecondFileName}"
+                                                               TextWrapping="Wrap"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               MaxLines="2"
+                                                               FontSize="12.5"
+                                                               LineHeight="18"
+                                                               Foreground="{StaticResource BrushInk}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+
+                                    <Border Grid.Row="2"
+                                            Background="{StaticResource BrushSurface}"
+                                            BorderBrush="{StaticResource BrushLine}"
+                                            BorderThickness="1"
+                                            CornerRadius="6"
+                                            Padding="12,9">
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="→"
+                                                       FontSize="16"
+                                                       Foreground="{StaticResource BrushSuccess}" />
+                                            <StackPanel Grid.Column="1" Spacing="3">
+                                                <TextBlock Text="输出文件" Classes="field-label" FontSize="10.5" />
+                                                <TextBlock Text="{Binding OutputFileName}"
+                                                           ToolTip.Tip="{Binding OutputPath}"
                                                            TextWrapping="Wrap"
                                                            TextTrimming="CharacterEllipsis"
                                                            MaxLines="2"
                                                            FontSize="12.5"
-                                                           LineHeight="18"
-                                                           Foreground="{StaticResource BrushTextPrimary}" />
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource BrushInk}" />
+                                                <TextBlock Text="{Binding ErrorMessage}"
+                                                           IsVisible="{Binding !IsSuccess}"
+                                                           TextWrapping="Wrap"
+                                                           MaxLines="2"
+                                                           FontSize="11.5"
+                                                           Foreground="{StaticResource BrushDanger}" />
                                             </StackPanel>
-                                        </Border>
-                                    </Grid>
-
-                                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                                        <TextBlock Grid.Column="0"
-                                                   Text="→"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="17"
-                                                   Foreground="{StaticResource BrushSuccess}" />
-                                        <StackPanel Grid.Column="1" Spacing="3">
-                                            <TextBlock Text="输出文件"
-                                                       FontSize="10.5"
-                                                       Foreground="{StaticResource BrushTextMuted}" />
-                                            <TextBlock Text="{Binding OutputFileName}"
-                                                       ToolTip.Tip="{Binding OutputPath}"
-                                                       TextWrapping="Wrap"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       MaxLines="2"
-                                                       FontSize="12.5"
-                                                       FontWeight="Medium"
-                                                       Foreground="{StaticResource BrushTextPrimary}" />
-                                            <TextBlock Text="{Binding ErrorMessage}"
-                                                       IsVisible="{Binding !IsSuccess}"
-                                                       TextWrapping="Wrap"
-                                                       MaxLines="2"
-                                                       FontSize="11.5"
-                                                       Foreground="{StaticResource BrushDanger}" />
-                                        </StackPanel>
-                                    </Grid>
+                                        </Grid>
+                                    </Border>
                                 </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
     </Border>
 </UserControl>

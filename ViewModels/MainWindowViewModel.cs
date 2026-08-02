@@ -30,8 +30,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty] private string _sourcePath = string.Empty;
     [ObservableProperty] private string _outputPath = string.Empty;
 
-    [ObservableProperty] private string _logContent = string.Empty;
     public string SystemStatusText => IsBusy ? "正在处理" : "系统就绪";
+    public ObservableCollection<LogEntry> LogEntries { get; } = new();
+    public bool HasLogEntries => LogEntries.Count > 0;
+    public bool HasNoLogEntries => !HasLogEntries;
+    public int LogEntryCount => LogEntries.Count;
     public ObservableCollection<MergeItemResult> MergeResults { get; } = new();
     public bool HasMergeResults => MergeResults.Count > 0;
     public bool HasNoMergeResults => !HasMergeResults;
@@ -241,18 +244,30 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     private void ClearLog()
     {
-        LogContent = string.Empty;
+        LogEntries.Clear();
+        NotifyLogEntriesChanged();
     }
+
     private void OnLogReceived(object? sender, string e)
     {
         // UI 线程更新日志（Avalonia 控件通常要求在主线程操作）
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
-            LogContent = e + Environment.NewLine + LogContent;
-            // 保持日志量可控，只保留最近 5000 字符
-            if (LogContent.Length > 5000)
-                LogContent = LogContent.Substring(0, 5000);
+            LogEntries.Insert(0, CreateLogEntry(e));
+            while (LogEntries.Count > 200)
+                LogEntries.RemoveAt(LogEntries.Count - 1);
+
+            NotifyLogEntriesChanged();
         });
+    }
+
+    private static LogEntry CreateLogEntry(string text)
+    {
+        const int timestampLength = 8;
+        if (text.Length > timestampLength && text[timestampLength] == ' ')
+            return new LogEntry(text[..timestampLength], text[(timestampLength + 1)..]);
+
+        return new LogEntry("--:--:--", text);
     }
 
     private void LogMessage(string msg)
@@ -283,6 +298,13 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(SuccessfulMergeCount));
         OnPropertyChanged(nameof(MergeSummaryText));
         OnPropertyChanged(nameof(CanPrintMergedFiles));
+    }
+
+    private void NotifyLogEntriesChanged()
+    {
+        OnPropertyChanged(nameof(HasLogEntries));
+        OnPropertyChanged(nameof(HasNoLogEntries));
+        OnPropertyChanged(nameof(LogEntryCount));
     }
 
     private static bool PathsEqual(string first, string second)

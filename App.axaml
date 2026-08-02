@@ -3,36 +3,39 @@
              x:Class="SmartInvoicePrintingTool.App"
              RequestedThemeVariant="Light">
     <Application.Resources>
-        <!-- Material Design 3 基础色板 -->
-        <SolidColorBrush x:Key="BrushWindow">#F9F7FC</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushSurface">#FFFBFE</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushSurfaceRaised">#F3EDF7</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushInput">#FFFBFE</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushBorder">#CAC4D0</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushBorderStrong">#79747E</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushTextPrimary">#1D1B20</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushTextSecondary">#49454F</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushTextMuted">#79747E</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushPrimary">#6750A4</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushPrimaryHover">#5A4295</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushPrimaryContainer">#EADDFF</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushOnPrimaryContainer">#21005D</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushSecondaryContainer">#E8DEF8</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushAccent">#006A6A</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushSuccess">#146C2E</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushSuccessContainer">#C4EED0</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushDanger">#B3261E</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushDangerContainer">#F9DEDC</SolidColorBrush>
+        <!-- PDF 生产工作台色板 -->
+        <SolidColorBrush x:Key="BrushCanvas">#F3F5F7</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSurface">#FFFFFF</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSurfaceSubtle">#F7F9FB</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushHeader">#162033</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushHeaderRaised">#202C42</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushInk">#17212B</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushInkSecondary">#536170</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushInkMuted">#7C8895</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushLine">#DCE2E8</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushLineStrong">#B9C3CD</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushBrand">#2457D6</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushBrandHover">#1948BF</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushBrandSoft">#E8EEFF</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushOnBrandSoft">#173B91</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSuccess">#18794E</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSuccessSoft">#E3F3EA</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushDanger">#B42318</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushDangerSoft">#FDE8E7</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushWarning">#9A6700</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushWarningSoft">#FFF4D6</SolidColorBrush>
 
         <Geometry x:Key="IconFolder">M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z</Geometry>
-        <Geometry x:Key="IconDownload">M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z</Geometry>
         <Geometry x:Key="IconPrinter">M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V14H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z</Geometry>
-        <Geometry x:Key="IconPlay">M8 5v14l11-7z</Geometry>
         <Geometry x:Key="IconStop">M6 6h12v12H6z</Geometry>
-        <Geometry x:Key="IconTerminal">M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z</Geometry>
         <Geometry x:Key="IconTrash">M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z</Geometry>
         <Geometry x:Key="IconReceipt">M19 3H5c-1.1 0-2 .9-2 2v16l3-2 3 2 3-2 3 2 3-2 3 2V5c0-1.1-.9-2-2-2zm-2 12H7v-2h10v2zm0-4H7V9h10v2zm0-4H7V5h10v2z</Geometry>
         <Geometry x:Key="IconCheck">M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z</Geometry>
+        <Geometry x:Key="IconFile">M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z</Geometry>
+        <Geometry x:Key="IconMerge">M7 3H3v4h4V3zm14 0h-4v4h4V3zM7 17H3v4h4v-4zm12-6h-6V7h2V5h-2V3H9v4h2v6H7v2h4v4H9v2h4v-2h2v2h4v-4h-4v2h-2v-6h6v2h2V9h-2v2z</Geometry>
+        <Geometry x:Key="IconActivity">M3 13H6.4L10 2L14.2 17.2L16.8 11H21V13H18.1L13.8 23L9.8 8.6L7.9 15H3V13Z</Geometry>
+
+        <BoxShadows x:Key="CardShadow">0 1 2 0 #14000000, 0 5 16 0 #0A1A2636</BoxShadows>
     </Application.Resources>
 
     <Application.Styles>
@@ -41,129 +44,140 @@
         <Style Selector="Window">
             <Setter Property="FontFamily" Value="Microsoft YaHei UI, Microsoft YaHei, Noto Sans CJK SC, sans-serif" />
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushInk}" />
         </Style>
 
-        <Style Selector="Border.material-card">
+        <Style Selector="Border.workspace-card">
             <Setter Property="Background" Value="{StaticResource BrushSurface}" />
-            <Setter Property="BorderBrush" Value="#1F79747E" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushLine}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="16" />
-            <Setter Property="Padding" Value="24" />
-            <Setter Property="BoxShadow" Value="0 2 6 0 #1F000000" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="BoxShadow" Value="{StaticResource CardShadow}" />
+        </Style>
+
+        <Style Selector="TextBlock.section-kicker">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource BrushBrand}" />
         </Style>
 
         <Style Selector="TextBlock.section-title">
-            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="FontSize" Value="18" />
-            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource BrushInk}" />
         </Style>
 
-        <Style Selector="TextBlock.supporting-text">
+        <Style Selector="TextBlock.body-muted">
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="{StaticResource BrushTextMuted}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushInkMuted}" />
         </Style>
 
         <Style Selector="TextBlock.field-label">
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}" />
-            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource BrushInkSecondary}" />
         </Style>
 
-        <Style Selector="Border.icon-container">
-            <Setter Property="Width" Value="40" />
-            <Setter Property="Height" Value="40" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Background" Value="{StaticResource BrushPrimaryContainer}" />
-        </Style>
-
-        <Style Selector="Button.material-filled">
-            <Setter Property="Background" Value="{StaticResource BrushPrimary}" />
+        <Style Selector="Button.command-primary">
+            <Setter Property="Background" Value="{StaticResource BrushBrand}" />
             <Setter Property="Foreground" Value="White" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="CornerRadius" Value="20" />
-            <Setter Property="Padding" Value="24,10" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Cursor" Value="Hand" />
-        </Style>
-
-        <Style Selector="Button.material-filled:pointerover">
-            <Setter Property="Background" Value="{StaticResource BrushPrimaryHover}" />
-        </Style>
-
-        <Style Selector="Button.material-tonal">
-            <Setter Property="Background" Value="{StaticResource BrushSecondaryContainer}" />
-            <Setter Property="Foreground" Value="{StaticResource BrushOnPrimaryContainer}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="20" />
-            <Setter Property="Padding" Value="20,10" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Padding" Value="20,11" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
 
-        <Style Selector="Button.material-tonal:pointerover">
-            <Setter Property="Background" Value="#DED3EF" />
+        <Style Selector="Button.command-primary:pointerover">
+            <Setter Property="Background" Value="{StaticResource BrushBrandHover}" />
         </Style>
 
-        <Style Selector="Button.material-danger">
-            <Setter Property="Background" Value="{StaticResource BrushDangerContainer}" />
+        <Style Selector="Button.command-secondary">
+            <Setter Property="Background" Value="{StaticResource BrushHeader}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Padding" Value="20,11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style Selector="Button.command-secondary:pointerover">
+            <Setter Property="Background" Value="{StaticResource BrushHeaderRaised}" />
+        </Style>
+
+        <Style Selector="Button.command-danger">
+            <Setter Property="Background" Value="{StaticResource BrushDangerSoft}" />
             <Setter Property="Foreground" Value="{StaticResource BrushDanger}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="20" />
-            <Setter Property="Padding" Value="20,10" />
+            <Setter Property="BorderBrush" Value="#2EB42318" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Padding" Value="14,9" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
 
-        <Style Selector="Button.material-danger:pointerover">
-            <Setter Property="Background" Value="#F3D2D0" />
+        <Style Selector="Button.browse-button">
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushBrand}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushLineStrong}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
         </Style>
 
-        <Style Selector="Button.material-text">
+        <Style Selector="Button.browse-button:pointerover">
+            <Setter Property="Background" Value="{StaticResource BrushBrandSoft}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBrand}" />
+        </Style>
+
+        <Style Selector="Button.quiet-button">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="{StaticResource BrushPrimary}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushInkSecondary}" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="18" />
-            <Setter Property="Padding" Value="12,8" />
-            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,7" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
 
-        <Style Selector="Button.material-text:pointerover">
-            <Setter Property="Background" Value="#146750A4" />
+        <Style Selector="Button.quiet-button:pointerover">
+            <Setter Property="Background" Value="{StaticResource BrushSurfaceSubtle}" />
+            <Setter Property="Foreground" Value="{StaticResource BrushBrand}" />
         </Style>
 
         <Style Selector="Button:disabled">
-            <Setter Property="Opacity" Value="0.38" />
+            <Setter Property="Opacity" Value="0.42" />
         </Style>
 
         <Style Selector="TextBox">
-            <Setter Property="CornerRadius" Value="4" />
-            <Setter Property="Background" Value="{StaticResource BrushInput}" />
-            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushLineStrong}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
-            <Setter Property="FontSize" Value="13.5" />
-            <Setter Property="SelectionBrush" Value="#666750A4" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{StaticResource BrushInk}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="SelectionBrush" Value="#552457D6" />
         </Style>
 
         <Style Selector="TextBox:focus-within">
-            <Setter Property="BorderBrush" Value="{StaticResource BrushPrimary}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBrand}" />
             <Setter Property="BorderThickness" Value="2" />
         </Style>
 
         <Style Selector="ComboBox">
-            <Setter Property="CornerRadius" Value="4" />
-            <Setter Property="Background" Value="{StaticResource BrushInput}" />
-            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderStrong}" />
-            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
-            <Setter Property="FontSize" Value="13.5" />
-            <Setter Property="MinHeight" Value="48" />
+            <Setter Property="Background" Value="{StaticResource BrushSurface}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushLineStrong}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{StaticResource BrushInk}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="MinHeight" Value="44" />
         </Style>
 
         <Style Selector="ComboBox:focus-within">
-            <Setter Property="BorderBrush" Value="{StaticResource BrushPrimary}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBrand}" />
         </Style>
     </Application.Styles>
 </Application>

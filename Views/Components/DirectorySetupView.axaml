@@ -3,84 +3,103 @@
              xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
              x:Class="SmartInvoicePrintingTool.Views.Components.DirectorySetupView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="material-card">
-        <StackPanel Spacing="24">
+    <Border Classes="workspace-card" Padding="24,22">
+        <StackPanel Spacing="20">
             <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14">
-                    <Border Classes="icon-container">
-                        <PathIcon Data="{StaticResource IconFolder}"
-                                  Foreground="{StaticResource BrushPrimary}"
-                                  Width="19"
-                                  Height="19"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Spacing="3" VerticalAlignment="Center">
-                        <TextBlock Text="选择文件目录" Classes="section-title" />
-                        <TextBlock Text="指定待处理发票和合并文件的保存位置" Classes="supporting-text" />
-                    </StackPanel>
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="01  文件准备" Classes="section-kicker" />
+                    <TextBlock Text="指定输入与产出位置" Classes="section-title" />
+                    <TextBlock Text="系统将扫描源目录中的 PDF，配对后生成到输出目录。"
+                               Classes="body-muted"
+                               TextWrapping="Wrap" />
                 </StackPanel>
 
                 <Border Grid.Column="1"
-                        Background="{StaticResource BrushPrimaryContainer}"
-                        CornerRadius="14"
-                        Padding="12,6"
-                        VerticalAlignment="Center">
-                    <TextBlock Text="第 1 步"
-                               FontSize="11.5"
+                        Background="{StaticResource BrushWarningSoft}"
+                        CornerRadius="6"
+                        Padding="11,7"
+                        VerticalAlignment="Top">
+                    <TextBlock Text="同名输出自动替换"
+                               FontSize="11"
                                FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushOnPrimaryContainer}" />
+                               Foreground="{StaticResource BrushWarning}" />
                 </Border>
             </Grid>
 
-            <StackPanel Spacing="9">
-                <TextBlock Text="源发票目录" Classes="field-label" />
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                    <TextBox Grid.Column="0"
-                             Text="{Binding SourcePath}"
-                             PlaceholderText="请选择包含待处理 PDF 发票的文件夹"
-                             IsReadOnly="True"
-                             Height="48"
-                             Padding="14,0"
-                             VerticalContentAlignment="Center" />
-                    <Button Grid.Column="1"
-                            Content="选择目录"
-                            Command="{Binding BrowseSourceCommand}"
-                            IsEnabled="{Binding !IsBusy}"
-                            Classes="material-tonal"
-                            Height="44"
-                            MinWidth="104" />
-                </Grid>
-            </StackPanel>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <Border Grid.Column="0"
+                        Background="{StaticResource BrushSurfaceSubtle}"
+                        BorderBrush="{StaticResource BrushLine}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
+                            <PathIcon Grid.Column="0"
+                                      Data="{StaticResource IconFolder}"
+                                      Foreground="{StaticResource BrushBrand}"
+                                      Width="16"
+                                      Height="16" />
+                            <TextBlock Grid.Column="1" Text="源 PDF 目录" Classes="field-label" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding SourcePath}"
+                                     PlaceholderText="选择包含待处理 PDF 的文件夹"
+                                     IsReadOnly="True"
+                                     Height="44"
+                                     Padding="12,0"
+                                     VerticalContentAlignment="Center"
+                                     ToolTip.Tip="{Binding SourcePath}" />
+                            <Button Grid.Column="1"
+                                    Content="浏览"
+                                    Command="{Binding BrowseSourceCommand}"
+                                    IsEnabled="{Binding !IsBusy}"
+                                    Classes="browse-button"
+                                    MinWidth="76"
+                                    Height="42" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-            <StackPanel Spacing="9">
-                <TextBlock Text="输出目录" Classes="field-label" />
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                    <TextBox Grid.Column="0"
-                             Text="{Binding OutputPath}"
-                             PlaceholderText="请选择合并后 PDF 文件的保存位置"
-                             IsReadOnly="True"
-                             Height="48"
-                             Padding="14,0"
-                             VerticalContentAlignment="Center" />
-                    <Button Grid.Column="1"
-                            Content="选择目录"
-                            Command="{Binding BrowseOutputCommand}"
-                            IsEnabled="{Binding !IsBusy}"
-                            Classes="material-tonal"
-                            Height="44"
-                            MinWidth="104" />
-                </Grid>
-            </StackPanel>
+                <Border Grid.Column="1"
+                        Background="{StaticResource BrushSurfaceSubtle}"
+                        BorderBrush="{StaticResource BrushLine}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
+                            <PathIcon Grid.Column="0"
+                                      Data="{StaticResource IconFile}"
+                                      Foreground="{StaticResource BrushSuccess}"
+                                      Width="16"
+                                      Height="16" />
+                            <TextBlock Grid.Column="1" Text="合并输出目录" Classes="field-label" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding OutputPath}"
+                                     PlaceholderText="选择合并 PDF 的保存文件夹"
+                                     IsReadOnly="True"
+                                     Height="44"
+                                     Padding="12,0"
+                                     VerticalContentAlignment="Center"
+                                     ToolTip.Tip="{Binding OutputPath}" />
+                            <Button Grid.Column="1"
+                                    Content="浏览"
+                                    Command="{Binding BrowseOutputCommand}"
+                                    IsEnabled="{Binding !IsBusy}"
+                                    Classes="browse-button"
+                                    MinWidth="76"
+                                    Height="42" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
 
-            <Border Background="{StaticResource BrushSurfaceRaised}"
-                    CornerRadius="10"
-                    Padding="14,11">
-                <TextBlock Text="提示：源目录与输出目录不能相同；输出目录中的同名合并文件将被替换。"
-                           FontSize="12"
-                           Foreground="{StaticResource BrushTextSecondary}"
-                           TextWrapping="Wrap" />
-            </Border>
+            <TextBlock Text="为避免源文件被当作输出处理，两个目录不能相同。"
+                       Classes="body-muted" />
         </StackPanel>
     </Border>
 </UserControl>
