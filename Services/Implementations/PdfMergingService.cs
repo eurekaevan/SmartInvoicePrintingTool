@@ -43,22 +43,32 @@ public sealed class PdfMergingService : IPdfMergingService
 
                 using var gfx = XGraphics.FromPdfPage(page);
 
-                // 绘制第一个 PDF
                 var width1 = form1.Page.Width.Point;
                 var height1 = form1.Page.Height.Point;
-                var rect1 = new XRect(
-                    0, 0,
-                    width1 * scale1,
-                    height1 * scale1);
-                gfx.DrawImage(form1, rect1);
+                var scaledWidth1 = width1 * scale1;
+                var scaledHeight1 = height1 * scale1;
 
-                // 绘制第二个 PDF
                 var width2 = form2.Page.Width.Point;
                 var height2 = form2.Page.Height.Point;
+                var scaledWidth2 = width2 * scale2;
+                var scaledHeight2 = height2 * scale2;
+
+                // 将两张缩放后的 PDF 作为一个整体在 A4 页面居中拼接。
+                var contentHeight = scaledHeight1 + PdfConstants.Spacing + scaledHeight2;
+                var startY = (PdfConstants.A4Height - contentHeight) / 2;
+
+                var rect1 = new XRect(
+                    (PdfConstants.A4Width - scaledWidth1) / 2,
+                    startY,
+                    scaledWidth1,
+                    scaledHeight1);
+                gfx.DrawImage(form1, rect1);
+
                 var rect2 = new XRect(
-                    0, height1 * scale1 + PdfConstants.Spacing,
-                    width2 * scale2,
-                    height2 * scale2);
+                    (PdfConstants.A4Width - scaledWidth2) / 2,
+                    startY + scaledHeight1 + PdfConstants.Spacing,
+                    scaledWidth2,
+                    scaledHeight2);
                 gfx.DrawImage(form2, rect2);
 
                 outputDocument.Save(outputPath);
