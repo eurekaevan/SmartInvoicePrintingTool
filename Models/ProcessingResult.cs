@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace SmartInvoicePrintingTool.Models;
 
 public sealed record ProcessingResult(
@@ -7,8 +9,7 @@ public sealed record ProcessingResult(
     int UnpairedCount,
     int MergeSucceeded,
     int MergeFailed,
-    int PrintSubmitted,
-    int PrintFailed)
+    IReadOnlyList<MergeItemResult> PairResults)
 {
-    public bool HasFailures => MergeFailed > 0 || PrintFailed > 0;
+    public bool HasFailures => MergeFailed > 0;
 }

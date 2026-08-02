@@ -22,11 +22,11 @@
                                       VerticalAlignment="Center" />
                         </Border>
                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                            <TextBlock Text="处理日志"
+                            <TextBlock Text="运行日志"
                                        FontWeight="SemiBold"
                                        FontSize="13"
                                        Foreground="{StaticResource BrushTextPrimary}" />
-                            <TextBlock Text="显示最近的任务运行记录" Classes="supporting-text" FontSize="11" />
+                            <TextBlock Text="进度与异常记录，文件配对详见下方" Classes="supporting-text" FontSize="11" />
                         </StackPanel>
                     </StackPanel>
 

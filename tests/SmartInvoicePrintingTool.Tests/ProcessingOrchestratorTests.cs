@@ -10,7 +10,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
     private readonly string _testRoot = Path.Combine(Path.GetTempPath(), $"invoice-tool-tests-{Guid.NewGuid():N}");
 
     [Fact]
-    public async Task ProcessAsync_UsesSelectedPrinter_ReportsBoundedProgress_AndAvoidsOverwrite()
+    public async Task MergeAsync_ReplacesExistingOutput_ReportsProgress_AndReturnsPairDetails()
     {
         var source = CreateDirectory("source");
         var output = CreateDirectory("output");
@@ -18,7 +18,6 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         var shortPath = CreatePdf(source, "short.pdf");
         File.WriteAllText(Path.Combine(output, "long_short.pdf"), "existing");
 
-        var printer = new FakePrintingService();
         var progressValues = new List<double>();
         var orchestrator = CreateOrchestrator(
             new Dictionary<string, PdfMetadata>
@@ -26,32 +25,62 @@ public sealed class ProcessingOrchestratorTests : IDisposable
                 [longPath] = Metadata(longPath, 200, 600),
                 [shortPath] = Metadata(shortPath, 400, 400)
             },
-            printer,
+            new FakePrintingService(),
             new SuccessfulMergingService());
 
-        var result = await orchestrator.ProcessAsync(
+        var result = await orchestrator.MergeAsync(
             source,
             output,
-            "Office Printer",
             new SynchronousProgress(progressValues.Add));
 
         Assert.Equal(1, result.MergeSucceeded);
-        Assert.Equal(1, result.PrintSubmitted);
-        Assert.Equal("Office Printer", printer.LastPrinterName);
-        Assert.EndsWith("long_short_2.pdf", printer.LastPdfPath, StringComparison.Ordinal);
+        Assert.Equal("merged", File.ReadAllText(Path.Combine(output, "long_short.pdf")));
+        Assert.False(File.Exists(Path.Combine(output, "long_short_2.pdf")));
+        var pairResult = Assert.Single(result.PairResults);
+        Assert.True(pairResult.IsSuccess);
+        Assert.Equal("long.pdf", pairResult.FirstFileName);
+        Assert.Equal("short.pdf", pairResult.SecondFileName);
+        Assert.Equal("long_short.pdf", pairResult.OutputFileName);
         Assert.All(progressValues, value => Assert.InRange(value, 0, 100));
         Assert.Equal(0, progressValues.First());
         Assert.Equal(100, progressValues.Last());
-        Assert.Equal("existing", File.ReadAllText(Path.Combine(output, "long_short.pdf")));
     }
 
     [Fact]
-    public async Task ProcessAsync_WhenMergeFails_ReturnsPartialFailureWithoutPrinting()
+    public async Task PrintAsync_UsesSelectedPrinter_AndReportsBoundedProgress()
+    {
+        var output = CreateDirectory("print-output");
+        var mergedPath = CreatePdf(output, "merged.pdf");
+        var printer = new FakePrintingService();
+        var progressValues = new List<double>();
+        var orchestrator = CreateOrchestrator(
+            new Dictionary<string, PdfMetadata>(),
+            printer,
+            new SuccessfulMergingService());
+
+        var result = await orchestrator.PrintAsync(
+            [mergedPath],
+            "Office Printer",
+            new SynchronousProgress(progressValues.Add));
+
+        Assert.Equal(1, result.Submitted);
+        Assert.Equal(0, result.Failed);
+        Assert.Equal("Office Printer", printer.LastPrinterName);
+        Assert.Equal(mergedPath, printer.LastPdfPath);
+        Assert.All(progressValues, value => Assert.InRange(value, 0, 100));
+        Assert.Equal(0, progressValues.First());
+        Assert.Equal(100, progressValues.Last());
+    }
+
+    [Fact]
+    public async Task MergeAsync_WhenMergeFails_ReturnsPairFailureWithoutPrinting()
     {
         var source = CreateDirectory("source");
         var output = CreateDirectory("output");
         var longPath = CreatePdf(source, "long.pdf");
         var shortPath = CreatePdf(source, "short.pdf");
+        var existingOutputPath = Path.Combine(output, "long_short.pdf");
+        File.WriteAllText(existingOutputPath, "existing");
         var printer = new FakePrintingService();
         var orchestrator = CreateOrchestrator(
             new Dictionary<string, PdfMetadata>
@@ -62,16 +91,19 @@ public sealed class ProcessingOrchestratorTests : IDisposable
             printer,
             new FailedMergingService());
 
-        var result = await orchestrator.ProcessAsync(source, output, "Office Printer");
+        var result = await orchestrator.MergeAsync(source, output);
 
         Assert.True(result.HasFailures);
         Assert.Equal(1, result.MergeFailed);
-        Assert.Equal(0, result.PrintSubmitted);
+        var pairResult = Assert.Single(result.PairResults);
+        Assert.False(pairResult.IsSuccess);
+        Assert.NotNull(pairResult.ErrorMessage);
+        Assert.Equal("existing", File.ReadAllText(existingOutputPath));
         Assert.Null(printer.LastPrinterName);
     }
 
     [Fact]
-    public async Task ProcessAsync_WhenCancelled_PropagatesCancellation()
+    public async Task MergeAsync_WhenCancelled_PropagatesCancellation()
     {
         var source = CreateDirectory("source");
         var output = CreateDirectory("output");
@@ -84,11 +116,11 @@ public sealed class ProcessingOrchestratorTests : IDisposable
             new SuccessfulMergingService());
 
         await Assert.ThrowsAsync<OperationCanceledException>(() =>
-            orchestrator.ProcessAsync(source, output, "Office Printer", ct: cts.Token));
+            orchestrator.MergeAsync(source, output, ct: cts.Token));
     }
 
     [Fact]
-    public async Task ProcessAsync_RejectsSameSourceAndOutputDirectory()
+    public async Task MergeAsync_RejectsSameSourceAndOutputDirectory()
     {
         var directory = CreateDirectory("same");
         var orchestrator = CreateOrchestrator(
@@ -97,7 +129,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
             new SuccessfulMergingService());
 
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            orchestrator.ProcessAsync(directory, directory, "Office Printer"));
+            orchestrator.MergeAsync(directory, directory));
     }
 
     private ProcessingOrchestrator CreateOrchestrator(
