@@ -4,9 +4,10 @@
              xmlns:models="using:InvoicePress.Models"
              x:Class="InvoicePress.Views.Components.LogConsoleView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="workspace-card" Padding="0">
-        <StackPanel>
-            <Border Padding="24,18"
+    <Border Classes="workspace-card" Padding="0" Height="360">
+        <Grid RowDefinitions="Auto,*">
+            <Border Grid.Row="0"
+                    Padding="24,18"
                     BorderBrush="{StaticResource BrushLine}"
                     BorderThickness="0,0,0,1">
                 <Grid ColumnDefinitions="*,Auto">
@@ -34,44 +35,49 @@
                 </Grid>
             </Border>
 
-            <Border IsVisible="{Binding HasNoLogEntries}"
-                    Background="{StaticResource BrushSurfaceSubtle}"
-                    Padding="24,28"
-                    CornerRadius="0,0,10,10">
-                <TextBlock Text="暂无运行记录"
-                           HorizontalAlignment="Center"
-                           FontSize="12.5"
-                           Foreground="{StaticResource BrushInkMuted}" />
-            </Border>
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <Border IsVisible="{Binding HasNoLogEntries}"
+                            Background="{StaticResource BrushSurfaceSubtle}"
+                            Padding="24,28"
+                            CornerRadius="0,0,10,10">
+                        <TextBlock Text="暂无运行记录"
+                                   HorizontalAlignment="Center"
+                                   FontSize="12.5"
+                                   Foreground="{StaticResource BrushInkMuted}" />
+                    </Border>
 
-            <!-- 日志列表不使用内部 ScrollViewer，由主页面统一滚动浏览。 -->
-            <ItemsControl IsVisible="{Binding HasLogEntries}"
-                          ItemsSource="{Binding LogEntries}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="models:LogEntry">
-                        <Border BorderBrush="{StaticResource BrushLine}"
-                                BorderThickness="0,0,0,1"
-                                Padding="24,12">
-                            <Grid ColumnDefinitions="72,1,*" ColumnSpacing="14">
-                                <TextBlock Grid.Column="0"
-                                           Text="{Binding Timestamp}"
-                                           FontFamily="Cascadia Mono, Consolas, monospace"
-                                           FontSize="11.5"
-                                           Foreground="{StaticResource BrushInkMuted}" />
-                                <Border Grid.Column="1"
-                                        Width="1"
-                                        Background="{StaticResource BrushLine}" />
-                                <TextBlock Grid.Column="2"
-                                           Text="{Binding Message}"
-                                           TextWrapping="Wrap"
-                                           FontSize="12.5"
-                                           LineHeight="19"
-                                           Foreground="{StaticResource BrushInkSecondary}" />
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+                    <ItemsControl IsVisible="{Binding HasLogEntries}"
+                                  ItemsSource="{Binding LogEntries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:LogEntry">
+                                <Border BorderBrush="{StaticResource BrushLine}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="24,12">
+                                    <Grid ColumnDefinitions="72,1,*" ColumnSpacing="14">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Timestamp}"
+                                                   FontFamily="Cascadia Mono, Consolas, monospace"
+                                                   FontSize="11.5"
+                                                   Foreground="{StaticResource BrushInkMuted}" />
+                                        <Border Grid.Column="1"
+                                                Width="1"
+                                                Background="{StaticResource BrushLine}" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding Message}"
+                                                   TextWrapping="Wrap"
+                                                   FontSize="12.5"
+                                                   LineHeight="19"
+                                                   Foreground="{StaticResource BrushInkSecondary}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Border>
 </UserControl>

@@ -20,7 +20,7 @@
     <Grid RowDefinitions="Auto,*">
         <components:AppHeaderView Grid.Row="0" />
 
-        <!-- 页面只保留这一个主滚动区，合并结果和运行日志均随页面滚动。 -->
+        <!-- 页面保留主滚动区；处理清单与日志在固定高度内容区内独立滚动。 -->
         <ScrollViewer Grid.Row="1"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">

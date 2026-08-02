@@ -4,9 +4,10 @@
              xmlns:models="using:InvoicePress.Models"
              x:Class="InvoicePress.Views.Components.MergeResultsView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="workspace-card" Padding="0">
-        <StackPanel>
-            <Border Padding="24,20"
+    <Border Classes="workspace-card" Padding="0" Height="520">
+        <Grid RowDefinitions="Auto,*">
+            <Border Grid.Row="0"
+                    Padding="24,20"
                     BorderBrush="{StaticResource BrushLine}"
                     BorderThickness="0,0,0,1">
                 <Grid ColumnDefinitions="*,Auto">
@@ -37,38 +38,42 @@
                 </Grid>
             </Border>
 
-            <Border IsVisible="{Binding HasNoMergeResults}"
-                    Background="{StaticResource BrushSurfaceSubtle}"
-                    Padding="28,36"
-                    CornerRadius="0,0,10,10">
-                <Grid ColumnDefinitions="42,*" ColumnSpacing="14" HorizontalAlignment="Center">
-                    <Border Grid.Column="0"
-                            Width="42"
-                            Height="42"
-                            CornerRadius="8"
-                            Background="{StaticResource BrushBrandSoft}">
-                        <PathIcon Data="{StaticResource IconMerge}"
-                                  Foreground="{StaticResource BrushBrand}"
-                                  Width="18"
-                                  Height="18"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center" />
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <Border IsVisible="{Binding HasNoMergeResults}"
+                            Background="{StaticResource BrushSurfaceSubtle}"
+                            Padding="28,36"
+                            CornerRadius="0,0,10,10">
+                        <Grid ColumnDefinitions="42,*" ColumnSpacing="14" HorizontalAlignment="Center">
+                            <Border Grid.Column="0"
+                                    Width="42"
+                                    Height="42"
+                                    CornerRadius="8"
+                                    Background="{StaticResource BrushBrandSoft}">
+                                <PathIcon Data="{StaticResource IconMerge}"
+                                          Foreground="{StaticResource BrushBrand}"
+                                          Width="18"
+                                          Height="18"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                                <TextBlock Text="等待合并结果"
+                                           FontSize="13.5"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource BrushInkSecondary}" />
+                                <TextBlock Text="完成合并后，这里会逐组展示两个源文件与它们的输出文件。"
+                                           Classes="body-muted"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
                     </Border>
-                    <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
-                        <TextBlock Text="等待合并结果"
-                                   FontSize="13.5"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource BrushInkSecondary}" />
-                        <TextBlock Text="完成合并后，这里会逐组展示两个源文件与它们的输出文件。"
-                                   Classes="body-muted"
-                                   TextWrapping="Wrap" />
-                    </StackPanel>
-                </Grid>
-            </Border>
 
-            <ItemsControl IsVisible="{Binding HasStandaloneResults}"
-                          ItemsSource="{Binding StandaloneResults}"
-                          Margin="18,18,18,0">
+                    <ItemsControl IsVisible="{Binding HasStandaloneResults}"
+                                  ItemsSource="{Binding StandaloneResults}"
+                                  Margin="18,18,18,0">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Spacing="10" />
@@ -136,11 +141,11 @@
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                    </ItemsControl>
 
-            <ItemsControl IsVisible="{Binding HasPairResults}"
-                          ItemsSource="{Binding MergeResults}"
-                          Margin="18">
+                    <ItemsControl IsVisible="{Binding HasPairResults}"
+                                  ItemsSource="{Binding MergeResults}"
+                                  Margin="18">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Spacing="10" />
@@ -294,7 +299,9 @@
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Border>
 </UserControl>
