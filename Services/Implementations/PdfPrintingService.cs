@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SmartInvoicePrintingTool.Models;
 using SmartInvoicePrintingTool.Services.Abstractions;
 
 namespace SmartInvoicePrintingTool.Services.Implementations;
@@ -36,20 +37,21 @@ public sealed class PdfPrintingService : IPdfPrintingService
         }
     }
 
-    public Task<bool> PrintAsync(string pdfPath, string printerName, CancellationToken ct = default)
+    public Task<PdfPrintSubmissionResult> PrintAsync(
+        string pdfPath, string printerName, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
 
         if (!File.Exists(pdfPath))
         {
             _logger.LogError("待打印 PDF 不存在: {File}", pdfPath);
-            return Task.FromResult(false);
+            return Task.FromResult(PdfPrintSubmissionResult.Failure("待打印 PDF 文件不存在"));
         }
 
         if (string.IsNullOrWhiteSpace(printerName))
         {
             _logger.LogError("未指定打印机: {File}", pdfPath);
-            return Task.FromResult(false);
+            return Task.FromResult(PdfPrintSubmissionResult.Failure("未指定打印机"));
         }
 
         try
@@ -70,19 +72,19 @@ public sealed class PdfPrintingService : IPdfPrintingService
             if (process == null)
             {
                 _logger.LogError("无法启动打印进程: {File}", pdfPath);
-                return Task.FromResult(false);
+                return Task.FromResult(PdfPrintSubmissionResult.Failure("系统未能启动 PDF 关联打印程序"));
             }
 
             _logger.LogInformation(
                 "已将打印任务提交给关联程序: {File} -> {Printer}",
                 Path.GetFileName(pdfPath),
                 printerName);
-            return Task.FromResult(true);
+            return Task.FromResult(PdfPrintSubmissionResult.Success());
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "打印任务提交失败: {File} -> {Printer}", pdfPath, printerName);
-            return Task.FromResult(false);
+            return Task.FromResult(PdfPrintSubmissionResult.Failure(ex.Message));
         }
     }
 }

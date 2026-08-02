@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
+using SmartInvoicePrintingTool.Models;
 using SmartInvoicePrintingTool.Services.Abstractions;
 // 使用别名避开命名冲突
 using MyPdfMetadata = SmartInvoicePrintingTool.Models.PdfMetadata;
@@ -16,12 +17,13 @@ public sealed class PdfMetadataService : IPdfMetadataService
 
     public PdfMetadataService(ILogger<PdfMetadataService> logger) => _logger = logger;
 
-    public async Task<MyPdfMetadata?> GetMetadataAsync(string pdfPath, CancellationToken ct = default)
+    public async Task<PdfMetadataReadResult> GetMetadataAsync(
+        string pdfPath, CancellationToken ct = default)
     {
         if (!System.IO.File.Exists(pdfPath))
         {
             _logger.LogWarning("PDF 文件不存在: {Path}", pdfPath);
-            return null;
+            return PdfMetadataReadResult.Failure("文件不存在");
         }
 
         PdfDocument? document = null;
@@ -35,16 +37,22 @@ public sealed class PdfMetadataService : IPdfMetadataService
                 if (document.PageCount == 0)
                 {
                     _logger.LogWarning("PDF 无页面: {Path}", pdfPath);
-                    return null;
+                    return PdfMetadataReadResult.Failure("PDF 不包含任何页面");
                 }
 
                 var page = document.Pages[0];
-                return new MyPdfMetadata
+                var width = page.Width.Point;
+                var height = page.Height.Point;
+                if (width <= 0 || height <= 0)
+                    return PdfMetadataReadResult.Failure(
+                        $"首页尺寸无效（宽 {width:F1}，高 {height:F1} 磅）");
+
+                return PdfMetadataReadResult.Success(new MyPdfMetadata
                 {
                     Path = pdfPath,
-                    Width = page.Width.Point,
-                    Height = page.Height.Point
-                };
+                    Width = width,
+                    Height = height
+                });
             }, ct);
         }
         catch (OperationCanceledException)
@@ -55,7 +63,7 @@ public sealed class PdfMetadataService : IPdfMetadataService
         catch (Exception ex)
         {
             _logger.LogError(ex, "读取 PDF 失败: {Path}", pdfPath);
-            return null;
+            return PdfMetadataReadResult.Failure(ex.Message);
         }
         finally
         {

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
+using SmartInvoicePrintingTool.Models;
 using SmartInvoicePrintingTool.Services.Abstractions;
 using SmartInvoicePrintingTool.Utils;
 
@@ -16,7 +17,7 @@ public sealed class PdfMergingService : IPdfMergingService
 
     public PdfMergingService(ILogger<PdfMergingService> logger) => _logger = logger;
 
-    public async Task<bool> MergeAsync(
+    public async Task<PdfMergeResult> MergeAsync(
         string pdf1Path, double scale1,
         string pdf2Path, double scale2,
         string outputPath, CancellationToken ct = default)
@@ -34,7 +35,10 @@ public sealed class PdfMergingService : IPdfMergingService
                 form1 = XPdfForm.FromFile(pdf1Path);
                 form2 = XPdfForm.FromFile(pdf2Path);
 
-                if (form1.Page == null || form2.Page == null) return false;
+                if (form1.Page == null)
+                    return PdfMergeResult.Failure("文件 A 没有可绘制的 PDF 页面");
+                if (form2.Page == null)
+                    return PdfMergeResult.Failure("文件 B 没有可绘制的 PDF 页面");
 
                 outputDocument = new PdfDocument();
                 var page = outputDocument.AddPage();
@@ -73,7 +77,7 @@ public sealed class PdfMergingService : IPdfMergingService
 
                 outputDocument.Save(outputPath);
                 _logger.LogDebug("合并成功: {OutputPath}", outputPath);
-                return true;
+                return PdfMergeResult.Success();
             }, ct);
         }
         catch (OperationCanceledException)
@@ -84,7 +88,7 @@ public sealed class PdfMergingService : IPdfMergingService
         catch (Exception ex)
         {
             _logger.LogError(ex, "合并失败: {Pdf1} + {Pdf2}", pdf1Path, pdf2Path);
-            return false;
+            return PdfMergeResult.Failure(ex.Message);
         }
         finally
         {

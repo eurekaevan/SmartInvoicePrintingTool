@@ -65,6 +65,35 @@ public sealed class ProcessingOrchestratorTests : IDisposable
     }
 
     [Fact]
+    public async Task MergeAsync_WhenScalingFails_LogsConcreteConstraintReason()
+    {
+        var source = CreateDirectory("scale-failure-source");
+        var output = CreateDirectory("scale-failure-output");
+        var tooWidePath = CreatePdf(source, "too-wide.pdf");
+        var normalPath = CreatePdf(source, "normal.pdf");
+        var logSink = new FakeLogSink();
+        var orchestrator = CreateOrchestrator(
+            new Dictionary<string, PdfMetadata>
+            {
+                [tooWidePath] = Metadata(tooWidePath, 900, 500),
+                [normalPath] = Metadata(normalPath, 200, 200)
+            },
+            new FakePrintingService(),
+            new SuccessfulMergingService(),
+            logSink);
+
+        var result = await orchestrator.MergeAsync(source, output);
+
+        Assert.Equal(1, result.MergeFailed);
+        Assert.Contains(
+            logSink.Messages,
+            message => message.Contains("缩放失败", StringComparison.Ordinal)
+                && message.Contains("原因", StringComparison.Ordinal)
+                && message.Contains("70%", StringComparison.Ordinal)
+                && message.Contains("A4", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task MergeAsync_ReplacesExistingOutput_ReportsProgress_AndReturnsPairDetails()
     {
         var source = CreateDirectory("source");
@@ -164,6 +193,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         var existingOutputPath = Path.Combine(output, "long_short.pdf");
         File.WriteAllText(existingOutputPath, "existing");
         var printer = new FakePrintingService();
+        var logSink = new FakeLogSink();
         var orchestrator = CreateOrchestrator(
             new Dictionary<string, PdfMetadata>
             {
@@ -171,7 +201,8 @@ public sealed class ProcessingOrchestratorTests : IDisposable
                 [shortPath] = Metadata(shortPath, 400, 400)
             },
             printer,
-            new FailedMergingService());
+            new FailedMergingService(),
+            logSink);
 
         var result = await orchestrator.MergeAsync(source, output);
 
@@ -182,6 +213,52 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         Assert.NotNull(pairResult.ErrorMessage);
         Assert.Equal("existing", File.ReadAllText(existingOutputPath));
         Assert.Null(printer.LastPrinterName);
+        Assert.Contains(
+            logSink.Messages,
+            message => message.Contains("合并失败", StringComparison.Ordinal)
+                && message.Contains("测试合并失败原因", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task MergeAsync_WhenMetadataReadFails_LogsFileAndReason()
+    {
+        var source = CreateDirectory("metadata-failure-source");
+        var output = CreateDirectory("metadata-failure-output");
+        CreatePdf(source, "broken.pdf");
+        var logSink = new FakeLogSink();
+        var orchestrator = CreateOrchestrator(
+            new Dictionary<string, PdfMetadata>(),
+            new FakePrintingService(),
+            new SuccessfulMergingService(),
+            logSink);
+
+        await orchestrator.MergeAsync(source, output);
+
+        Assert.Contains(
+            logSink.Messages,
+            message => message.Contains("读取失败: broken.pdf", StringComparison.Ordinal)
+                && message.Contains("测试元数据不存在", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task PrintAsync_WhenSubmissionFails_LogsServiceReason()
+    {
+        var output = CreateDirectory("print-failure-output");
+        var pdfPath = CreatePdf(output, "merged.pdf");
+        var logSink = new FakeLogSink();
+        var orchestrator = CreateOrchestrator(
+            new Dictionary<string, PdfMetadata>(),
+            new FailedPrintingService(),
+            new SuccessfulMergingService(),
+            logSink);
+
+        var result = await orchestrator.PrintAsync([pdfPath], "Office Printer");
+
+        Assert.Equal(1, result.Failed);
+        Assert.Contains(
+            logSink.Messages,
+            message => message.Contains("打印提交失败: merged.pdf", StringComparison.Ordinal)
+                && message.Contains("测试打印失败原因", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -217,14 +294,15 @@ public sealed class ProcessingOrchestratorTests : IDisposable
     private ProcessingOrchestrator CreateOrchestrator(
         IReadOnlyDictionary<string, PdfMetadata> metadata,
         IPdfPrintingService printingService,
-        IPdfMergingService mergingService) =>
+        IPdfMergingService mergingService,
+        ILogSink? logSink = null) =>
         new(
             new FakeMetadataService(metadata),
             new PdfPairMatchingService(),
             new ScaleCalculationService(),
             mergingService,
             printingService,
-            new FakeLogSink());
+            logSink ?? new FakeLogSink());
 
     private string CreateDirectory(string name)
     {
@@ -250,16 +328,20 @@ public sealed class ProcessingOrchestratorTests : IDisposable
 
     private sealed class FakeMetadataService(IReadOnlyDictionary<string, PdfMetadata> metadata) : IPdfMetadataService
     {
-        public Task<PdfMetadata?> GetMetadataAsync(string pdfPath, CancellationToken ct = default)
+        public Task<PdfMetadataReadResult> GetMetadataAsync(
+            string pdfPath, CancellationToken ct = default)
         {
             ct.ThrowIfCancellationRequested();
-            return Task.FromResult(metadata.GetValueOrDefault(pdfPath));
+            var value = metadata.GetValueOrDefault(pdfPath);
+            return Task.FromResult(value == null
+                ? PdfMetadataReadResult.Failure("测试元数据不存在")
+                : PdfMetadataReadResult.Success(value));
         }
     }
 
     private sealed class SuccessfulMergingService : IPdfMergingService
     {
-        public Task<bool> MergeAsync(
+        public Task<PdfMergeResult> MergeAsync(
             string pdf1Path,
             double scale1,
             string pdf2Path,
@@ -269,19 +351,20 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         {
             ct.ThrowIfCancellationRequested();
             File.WriteAllText(outputPath, "merged");
-            return Task.FromResult(true);
+            return Task.FromResult(PdfMergeResult.Success());
         }
     }
 
     private sealed class FailedMergingService : IPdfMergingService
     {
-        public Task<bool> MergeAsync(
+        public Task<PdfMergeResult> MergeAsync(
             string pdf1Path,
             double scale1,
             string pdf2Path,
             double scale2,
             string outputPath,
-            CancellationToken ct = default) => Task.FromResult(false);
+            CancellationToken ct = default) =>
+            Task.FromResult(PdfMergeResult.Failure("测试合并失败原因"));
     }
 
     private sealed class FakePrintingService : IPdfPrintingService
@@ -292,20 +375,36 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         public Task<IReadOnlyList<string>> GetAvailablePrintersAsync() =>
             Task.FromResult<IReadOnlyList<string>>(["Office Printer"]);
 
-        public Task<bool> PrintAsync(string pdfPath, string printerName, CancellationToken ct = default)
+        public Task<PdfPrintSubmissionResult> PrintAsync(
+            string pdfPath, string printerName, CancellationToken ct = default)
         {
             ct.ThrowIfCancellationRequested();
             LastPdfPath = pdfPath;
             LastPrinterName = printerName;
-            return Task.FromResult(true);
+            return Task.FromResult(PdfPrintSubmissionResult.Success());
         }
+    }
+
+    private sealed class FailedPrintingService : IPdfPrintingService
+    {
+        public Task<IReadOnlyList<string>> GetAvailablePrintersAsync() =>
+            Task.FromResult<IReadOnlyList<string>>(["Office Printer"]);
+
+        public Task<PdfPrintSubmissionResult> PrintAsync(
+            string pdfPath, string printerName, CancellationToken ct = default) =>
+            Task.FromResult(PdfPrintSubmissionResult.Failure("测试打印失败原因"));
     }
 
     private sealed class FakeLogSink : ILogSink
     {
         public event EventHandler<string>? LogMessage;
+        public List<string> Messages { get; } = [];
 
-        public void Log(string message) => LogMessage?.Invoke(this, message);
+        public void Log(string message)
+        {
+            Messages.Add(message);
+            LogMessage?.Invoke(this, message);
+        }
     }
 
     private sealed class SynchronousProgress(Action<double> report) : IProgress<double>

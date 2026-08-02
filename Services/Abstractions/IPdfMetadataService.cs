@@ -6,5 +6,6 @@ namespace SmartInvoicePrintingTool.Services.Abstractions;
 
 public interface IPdfMetadataService
 {
-    Task<PdfMetadata?> GetMetadataAsync(string pdfPath, CancellationToken ct = default);
+    Task<PdfMetadataReadResult> GetMetadataAsync(
+        string pdfPath, CancellationToken ct = default);
 }

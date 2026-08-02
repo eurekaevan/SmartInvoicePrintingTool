@@ -82,10 +82,11 @@ public sealed class MainWindowViewModelTests : IDisposable
         public Task<IReadOnlyList<string>> GetAvailablePrintersAsync() =>
             Task.FromResult<IReadOnlyList<string>>(["Office Printer"]);
 
-        public Task<bool> PrintAsync(
+        public Task<PdfPrintSubmissionResult> PrintAsync(
             string pdfPath,
             string printerName,
-            CancellationToken ct = default) => Task.FromResult(true);
+            CancellationToken ct = default) =>
+            Task.FromResult(PdfPrintSubmissionResult.Success());
     }
 
     private sealed class FakeLogSink : ILogSink

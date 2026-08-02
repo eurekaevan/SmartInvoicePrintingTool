@@ -60,8 +60,16 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         for (int i = 0; i < pdfPaths.Length; i++)
         {
             ct.ThrowIfCancellationRequested();
-            var meta = await _metadataService.GetMetadataAsync(pdfPaths[i], ct);
-            if (meta is { Width: > 0, Height: > 0 }) pdfs.Add(meta);
+            var metadataResult = await _metadataService.GetMetadataAsync(pdfPaths[i], ct);
+            if (metadataResult.Metadata != null)
+            {
+                pdfs.Add(metadataResult.Metadata);
+            }
+            else
+            {
+                _logSink.Log(
+                    $"读取失败: {Path.GetFileName(pdfPaths[i])}；原因：{GetFailureReason(metadataResult.ErrorMessage)}");
+            }
             progress?.Report((double)(i + 1) / pdfPaths.Length * 30);
         }
 
@@ -98,9 +106,10 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             var secondFileName = Path.GetFileName(pair.SecondPdf.Path);
             var outputPath = Path.Combine(outputFolder, pair.OutputFileName);
             var scales = _scaleService.CalculateScales(pair.FirstPdf, pair.SecondPdf);
-            if (scales == null)
+            if (!scales.IsSuccess)
             {
-                _logSink.Log($"缩放失败: {pair.FirstPdf.FileName} + {pair.SecondPdf.FileName}");
+                var failureReason = GetFailureReason(scales.ErrorMessage);
+                _logSink.Log($"缩放失败: {firstFileName} + {secondFileName}；原因：{failureReason}");
                 mergeFailed++;
                 pairResults.Add(new MergeItemResult(
                     firstFileName,
@@ -108,34 +117,35 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
                     pair.OutputFileName,
                     outputPath,
                     false,
-                    "无法计算合适的缩放比例"));
+                    failureReason));
                 processed++;
                 ReportPairProgress(progress, processed, pairs.Count);
                 continue;
             }
 
-            pair.FirstScale = scales.Value.FirstScale;
-            pair.SecondScale = scales.Value.SecondScale;
+            pair.FirstScale = scales.FirstScale;
+            pair.SecondScale = scales.SecondScale;
 
             var temporaryPath = Path.Combine(outputFolder, $".{Guid.NewGuid():N}.tmp.pdf");
             try
             {
-                var merged = await _mergingService.MergeAsync(
+                var mergeResult = await _mergingService.MergeAsync(
                     pair.FirstPdf.Path, pair.FirstScale,
                     pair.SecondPdf.Path, pair.SecondScale,
                     temporaryPath, ct);
 
-                if (!merged)
+                if (!mergeResult.IsSuccess)
                 {
+                    var failureReason = GetFailureReason(mergeResult.ErrorMessage);
                     mergeFailed++;
-                    _logSink.Log($"合并失败: {pair.OutputFileName}");
+                    _logSink.Log($"合并失败: {pair.OutputFileName}；原因：{failureReason}");
                     pairResults.Add(new MergeItemResult(
                         firstFileName,
                         secondFileName,
                         pair.OutputFileName,
                         outputPath,
                         false,
-                        "PDF 合并服务未能生成文件"));
+                        failureReason));
                     continue;
                 }
 
@@ -155,15 +165,16 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             }
             catch (Exception ex)
             {
+                var failureReason = GetFailureReason(ex.Message);
                 mergeFailed++;
-                _logSink.Log($"处理失败: {pair.OutputFileName} ({ex.Message})");
+                _logSink.Log($"处理失败: {pair.OutputFileName}；原因：{failureReason}");
                 pairResults.Add(new MergeItemResult(
                     firstFileName,
                     secondFileName,
                     pair.OutputFileName,
                     outputPath,
                     false,
-                    ex.Message));
+                    failureReason));
             }
             finally
             {
@@ -215,17 +226,23 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
                 if (!File.Exists(pdfPath))
                 {
                     failed++;
-                    _logSink.Log($"打印跳过，文件不存在: {Path.GetFileName(pdfPath)}");
-                }
-                else if (await _printingService.PrintAsync(pdfPath, printerName, ct))
-                {
-                    submitted++;
-                    _logSink.Log($"已提交打印: {Path.GetFileName(pdfPath)} -> {printerName}");
+                    _logSink.Log(
+                        $"打印提交失败: {Path.GetFileName(pdfPath)}；原因：文件不存在或已被移动");
                 }
                 else
                 {
-                    failed++;
-                    _logSink.Log($"打印提交失败: {Path.GetFileName(pdfPath)}");
+                    var printResult = await _printingService.PrintAsync(pdfPath, printerName, ct);
+                    if (printResult.IsSuccess)
+                    {
+                        submitted++;
+                        _logSink.Log($"已提交打印: {Path.GetFileName(pdfPath)} -> {printerName}");
+                    }
+                    else
+                    {
+                        failed++;
+                        _logSink.Log(
+                            $"打印提交失败: {Path.GetFileName(pdfPath)}；原因：{GetFailureReason(printResult.ErrorMessage)}");
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -235,7 +252,8 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             catch (Exception ex)
             {
                 failed++;
-                _logSink.Log($"打印提交失败: {Path.GetFileName(pdfPath)} ({ex.Message})");
+                _logSink.Log(
+                    $"打印提交失败: {Path.GetFileName(pdfPath)}；原因：{GetFailureReason(ex.Message)}");
             }
             finally
             {
@@ -266,6 +284,9 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
 
     private static void ReportPairProgress(IProgress<double>? progress, int processed, int total) =>
         progress?.Report(30 + (double)processed / total * 70);
+
+    private static string GetFailureReason(string? errorMessage) =>
+        string.IsNullOrWhiteSpace(errorMessage) ? "服务未提供详细原因" : errorMessage;
 
     private static void TryDelete(string path)
     {
