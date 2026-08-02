@@ -19,7 +19,7 @@ public sealed class MainWindowViewModelTests : IDisposable
         Directory.CreateDirectory(source);
         Directory.CreateDirectory(output);
         var mergedPath = Path.Combine(output, "second_third.pdf");
-        var standalonePath = Path.Combine(source, "tallest.pdf");
+        var standalonePath = Path.Combine(output, "single_tallest.pdf");
         var orchestrator = new CapturingOrchestrator(
             new ProcessingResult(
                 3,
@@ -33,7 +33,12 @@ public sealed class MainWindowViewModelTests : IDisposable
                     "second_third.pdf",
                     mergedPath,
                     true)],
-                new StandalonePdfResult("tallest.pdf", standalonePath)));
+                [new StandalonePdfResult(
+                    "tallest.pdf",
+                    "single_tallest.pdf",
+                    standalonePath,
+                    true,
+                    "有效发票数量为奇数")]));
         using var viewModel = new MainWindowViewModel(
             orchestrator,
             new FakePrintingService(),

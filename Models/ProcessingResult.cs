@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartInvoicePrintingTool.Models;
 
@@ -9,7 +10,8 @@ public sealed record ProcessingResult(
     int MergeSucceeded,
     int MergeFailed,
     IReadOnlyList<MergeItemResult> PairResults,
-    StandalonePdfResult? StandalonePdf)
+    IReadOnlyList<StandalonePdfResult> StandaloneResults)
 {
-    public bool HasFailures => MergeFailed > 0;
+    public bool HasFailures =>
+        MergeFailed > 0 || StandaloneResults.Any(item => !item.IsSuccess);
 }

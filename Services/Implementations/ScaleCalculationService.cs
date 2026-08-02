@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using SmartInvoicePrintingTool.Models;
 using SmartInvoicePrintingTool.Services.Abstractions;
 using SmartInvoicePrintingTool.Utils;
@@ -11,29 +10,23 @@ public class ScaleCalculationService : IScaleCalculationService
     public ScaleCalculationResult CalculateScales(
         PdfMetadata firstPdf, PdfMetadata secondPdf)
     {
-        for (double firstScale = PdfConstants.ScaleMax;
-             firstScale >= PdfConstants.ScaleMin;
-             firstScale -= PdfConstants.ScaleStep)
+        // 与 smart_printer.py 一致：优先让较短发票保持更大的比例，
+        // 再逐步缩小较长发票，只按两张发票的总高度判断能否放入 A4。
+        for (var secondPercent = PdfConstants.ScaleMaxPercent;
+             secondPercent >= PdfConstants.ScaleMinPercent;
+             secondPercent--)
         {
-            var firstWidth = firstPdf.Width * firstScale;
-            var firstHeight = firstPdf.Height * firstScale;
-
-            if (firstWidth > PdfConstants.A4Width || firstHeight > PdfConstants.A4Height)
-                continue;
-
-            var remainingHeight = PdfConstants.A4Height - firstHeight - PdfConstants.Spacing;
-
-            for (double secondScale = PdfConstants.ScaleMax;
-                 secondScale >= PdfConstants.ScaleMin;
-                 secondScale -= PdfConstants.ScaleStep)
+            var secondScale = secondPercent / 100.0;
+            for (var firstPercent = PdfConstants.ScaleMaxPercent;
+                 firstPercent >= PdfConstants.ScaleMinPercent;
+                 firstPercent--)
             {
-                var secondWidth = secondPdf.Width * secondScale;
-                var secondHeight = secondPdf.Height * secondScale;
+                var firstScale = firstPercent / 100.0;
+                var totalHeight = firstPdf.Height * firstScale
+                    + secondPdf.Height * secondScale;
 
-                if (secondWidth > PdfConstants.A4Width || secondHeight > remainingHeight)
-                    continue;
-
-                return ScaleCalculationResult.Success(firstScale, secondScale);
+                if (totalHeight <= PdfConstants.A4Height)
+                    return ScaleCalculationResult.Success(firstScale, secondScale);
             }
         }
 
@@ -42,25 +35,12 @@ public class ScaleCalculationService : IScaleCalculationService
 
     private static string BuildFailureReason(PdfMetadata firstPdf, PdfMetadata secondPdf)
     {
-        var minimum = PdfConstants.ScaleMin;
-        var firstWidth = firstPdf.Width * minimum;
+        var minimum = PdfConstants.StandaloneScale;
         var firstHeight = firstPdf.Height * minimum;
-        var secondWidth = secondPdf.Width * minimum;
         var secondHeight = secondPdf.Height * minimum;
-        var combinedHeight = firstHeight + PdfConstants.Spacing + secondHeight;
-        var reasons = new List<string>();
+        var combinedHeight = firstHeight + secondHeight;
 
-        if (firstWidth > PdfConstants.A4Width)
-            reasons.Add($"文件 A 缩小到 70% 后宽度 {firstWidth:F1} 磅，仍超过 A4 宽度 {PdfConstants.A4Width:F1} 磅");
-        if (firstHeight > PdfConstants.A4Height)
-            reasons.Add($"文件 A 缩小到 70% 后高度 {firstHeight:F1} 磅，仍超过 A4 高度 {PdfConstants.A4Height:F1} 磅");
-        if (secondWidth > PdfConstants.A4Width)
-            reasons.Add($"文件 B 缩小到 70% 后宽度 {secondWidth:F1} 磅，仍超过 A4 宽度 {PdfConstants.A4Width:F1} 磅");
-        if (combinedHeight > PdfConstants.A4Height)
-            reasons.Add($"两张发票均缩小到 70% 后的总高度（含间距）为 {combinedHeight:F1} 磅，超过 A4 高度 {PdfConstants.A4Height:F1} 磅");
-
-        return reasons.Count > 0
-            ? string.Join("；", reasons)
-            : "在 70%～100% 允许缩放范围内未找到可放入 A4 的组合";
+        return $"两张发票均缩小到 70% 后的总高度为 {combinedHeight:F1} 磅，"
+            + $"仍超过 A4 高度 {PdfConstants.A4Height:F1} 磅";
     }
 }

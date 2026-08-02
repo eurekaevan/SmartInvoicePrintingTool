@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SmartInvoicePrintingTool.Models;
 using SmartInvoicePrintingTool.Services.Abstractions;
+using SmartInvoicePrintingTool.Utils;
 
 namespace SmartInvoicePrintingTool.Services.Implementations;
 
@@ -13,7 +14,6 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
 {
     private readonly IPdfMetadataService _metadataService;
     private readonly IPdfPairMatchingService _pairMatchingService;
-    private readonly IScaleCalculationService _scaleService;
     private readonly IPdfMergingService _mergingService;
     private readonly IPdfPrintingService _printingService;
     private readonly ILogSink _logSink;
@@ -21,14 +21,12 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
     public ProcessingOrchestrator(
         IPdfMetadataService metadataService,
         IPdfPairMatchingService pairMatchingService,
-        IScaleCalculationService scaleService,
         IPdfMergingService mergingService,
         IPdfPrintingService printingService,
         ILogSink logSink)
     {
         _metadataService = metadataService ?? throw new ArgumentNullException(nameof(metadataService));
         _pairMatchingService = pairMatchingService ?? throw new ArgumentNullException(nameof(pairMatchingService));
-        _scaleService = scaleService ?? throw new ArgumentNullException(nameof(scaleService));
         _mergingService = mergingService ?? throw new ArgumentNullException(nameof(mergingService));
         _printingService = printingService ?? throw new ArgumentNullException(nameof(printingService));
         _logSink = logSink ?? throw new ArgumentNullException(nameof(logSink));
@@ -52,7 +50,7 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         {
             _logSink.Log("未找到有效的 PDF 文件");
             progress?.Report(100);
-            return new ProcessingResult(0, 0, 0, 0, 0, [], null);
+            return new ProcessingResult(0, 0, 0, 0, 0, [], []);
         }
 
         // 2. 获取元数据
@@ -73,31 +71,32 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             progress?.Report((double)(i + 1) / pdfPaths.Length * 30);
         }
 
-        // 3. 按高度降序后高低互补配对；奇数时最高 PDF 保留为单独打印项
+        // 3. 按高度高低互补动态配对；缩放失败时较长项单独成页，较短项回队重试
         ct.ThrowIfCancellationRequested();
         var pairingResult = _pairMatchingService.MatchPairs(pdfs);
         var pairs = pairingResult.Pairs;
-        var standalonePdf = pairingResult.StandalonePdf == null
-            ? null
-            : new StandalonePdfResult(
-                Path.GetFileName(pairingResult.StandalonePdf.Path),
-                pairingResult.StandalonePdf.Path);
+        var standalonePlans = pairingResult.StandalonePdfs;
         _logSink.Log($"按高度高低互补匹配到 {pairs.Count} 对");
-        if (standalonePdf != null)
-            _logSink.Log($"文件数为奇数，最高 PDF 将单独打印: {standalonePdf.FileName}");
+        foreach (var plan in standalonePlans)
+        {
+            _logSink.Log(
+                $"安排单独成页: {Path.GetFileName(plan.Pdf.Path)}；原因：{plan.Reason}");
+        }
 
-        if (pairs.Count == 0 && standalonePdf == null)
+        if (pairs.Count == 0 && standalonePlans.Count == 0)
         {
             _logSink.Log("没有可处理的 PDF 文件");
             progress?.Report(100);
-            return new ProcessingResult(pdfPaths.Length, pdfs.Count, 0, 0, 0, [], null);
+            return new ProcessingResult(pdfPaths.Length, pdfs.Count, 0, 0, 0, [], []);
         }
 
-        // 4. 计算缩放并合并
+        // 4. 生成合并页与单独 A4 页
         int processed = 0;
         int mergeSucceeded = 0;
         int mergeFailed = 0;
         var pairResults = new List<MergeItemResult>(pairs.Count);
+        var standaloneResults = new List<StandalonePdfResult>(standalonePlans.Count);
+        var totalOutputs = pairs.Count + standalonePlans.Count;
 
         foreach (var pair in pairs)
         {
@@ -105,27 +104,6 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             var firstFileName = Path.GetFileName(pair.FirstPdf.Path);
             var secondFileName = Path.GetFileName(pair.SecondPdf.Path);
             var outputPath = Path.Combine(outputFolder, pair.OutputFileName);
-            var scales = _scaleService.CalculateScales(pair.FirstPdf, pair.SecondPdf);
-            if (!scales.IsSuccess)
-            {
-                var failureReason = GetFailureReason(scales.ErrorMessage);
-                _logSink.Log($"缩放失败: {firstFileName} + {secondFileName}；原因：{failureReason}");
-                mergeFailed++;
-                pairResults.Add(new MergeItemResult(
-                    firstFileName,
-                    secondFileName,
-                    pair.OutputFileName,
-                    outputPath,
-                    false,
-                    failureReason));
-                processed++;
-                ReportPairProgress(progress, processed, pairs.Count);
-                continue;
-            }
-
-            pair.FirstScale = scales.FirstScale;
-            pair.SecondScale = scales.SecondScale;
-
             var temporaryPath = Path.Combine(outputFolder, $".{Guid.NewGuid():N}.tmp.pdf");
             try
             {
@@ -180,11 +158,81 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             {
                 TryDelete(temporaryPath);
                 processed++;
-                ReportPairProgress(progress, processed, pairs.Count);
+                ReportProcessingProgress(progress, processed, totalOutputs);
             }
         }
 
-        _logSink.Log($"合并结束: 成功 {mergeSucceeded}，失败 {mergeFailed}");
+        foreach (var plan in standalonePlans)
+        {
+            ct.ThrowIfCancellationRequested();
+            var sourceFileName = Path.GetFileName(plan.Pdf.Path);
+            var outputFileName = $"single_{plan.Pdf.FileName}.pdf";
+            var outputPath = Path.Combine(outputFolder, outputFileName);
+            var temporaryPath = Path.Combine(outputFolder, $".{Guid.NewGuid():N}.tmp.pdf");
+
+            try
+            {
+                var standaloneResult = await _mergingService.CreateStandaloneAsync(
+                    plan.Pdf.Path,
+                    PdfConstants.StandaloneScale,
+                    temporaryPath,
+                    ct);
+
+                if (!standaloneResult.IsSuccess)
+                {
+                    var failureReason = GetFailureReason(standaloneResult.ErrorMessage);
+                    standaloneResults.Add(new StandalonePdfResult(
+                        sourceFileName,
+                        outputFileName,
+                        outputPath,
+                        false,
+                        plan.Reason,
+                        failureReason));
+                    _logSink.Log(
+                        $"单独成页失败: {sourceFileName}；原因：{failureReason}；触发条件：{plan.Reason}");
+                    continue;
+                }
+
+                File.Move(temporaryPath, outputPath, overwrite: true);
+                standaloneResults.Add(new StandalonePdfResult(
+                    sourceFileName,
+                    outputFileName,
+                    outputPath,
+                    true,
+                    plan.Reason));
+                _logSink.Log(
+                    $"单独成页成功: {sourceFileName} -> {outputFileName}；原因：{plan.Reason}");
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                var failureReason = GetFailureReason(ex.Message);
+                standaloneResults.Add(new StandalonePdfResult(
+                    sourceFileName,
+                    outputFileName,
+                    outputPath,
+                    false,
+                    plan.Reason,
+                    failureReason));
+                _logSink.Log(
+                    $"单独成页失败: {sourceFileName}；原因：{failureReason}；触发条件：{plan.Reason}");
+            }
+            finally
+            {
+                TryDelete(temporaryPath);
+                processed++;
+                ReportProcessingProgress(progress, processed, totalOutputs);
+            }
+        }
+
+        var standaloneSucceeded = standaloneResults.Count(item => item.IsSuccess);
+        var standaloneFailed = standaloneResults.Count - standaloneSucceeded;
+        _logSink.Log(
+            $"处理结束: 合并成功 {mergeSucceeded}，合并失败 {mergeFailed}，"
+            + $"单独成页成功 {standaloneSucceeded}，单独成页失败 {standaloneFailed}");
         progress?.Report(100);
         return new ProcessingResult(
             pdfPaths.Length,
@@ -193,7 +241,7 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             mergeSucceeded,
             mergeFailed,
             pairResults,
-            standalonePdf);
+            standaloneResults);
     }
 
     public async Task<PrintResult> PrintAsync(
@@ -282,7 +330,7 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             throw new ArgumentException("源目录和输出目录不能相同。");
     }
 
-    private static void ReportPairProgress(IProgress<double>? progress, int processed, int total) =>
+    private static void ReportProcessingProgress(IProgress<double>? progress, int processed, int total) =>
         progress?.Report(30 + (double)processed / total * 70);
 
     private static string GetFailureReason(string? errorMessage) =>

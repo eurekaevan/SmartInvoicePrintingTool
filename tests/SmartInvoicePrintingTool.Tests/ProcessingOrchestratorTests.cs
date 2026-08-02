@@ -12,7 +12,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
     [Fact]
     public void MatchPairs_WhenCountIsEven_PairsHighestWithLowest()
     {
-        var service = new PdfPairMatchingService();
+        var service = new PdfPairMatchingService(new ScaleCalculationService());
         var result = service.MatchPairs(
         [
             Metadata("100.pdf", 100, 100),
@@ -21,7 +21,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
             Metadata("300.pdf", 100, 300)
         ]);
 
-        Assert.Null(result.StandalonePdf);
+        Assert.Empty(result.StandalonePdfs);
         Assert.Collection(
             result.Pairs,
             pair =>
@@ -39,7 +39,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
     [Fact]
     public void MatchPairs_WhenCountIsOdd_LeavesTallestPdfForStandalonePrinting()
     {
-        var service = new PdfPairMatchingService();
+        var service = new PdfPairMatchingService(new ScaleCalculationService());
         var result = service.MatchPairs(
         [
             Metadata("second.pdf", 100, 400),
@@ -49,7 +49,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
             Metadata("shortest.pdf", 100, 100)
         ]);
 
-        Assert.Equal("tallest", result.StandalonePdf?.FileName);
+        Assert.Equal("tallest", Assert.Single(result.StandalonePdfs).Pdf.FileName);
         Assert.Collection(
             result.Pairs,
             pair =>
@@ -65,17 +65,84 @@ public sealed class ProcessingOrchestratorTests : IDisposable
     }
 
     [Fact]
-    public async Task MergeAsync_WhenScalingFails_LogsConcreteConstraintReason()
+    public void MatchPairs_WhenHighestAndLowestCannotFit_RetriesLowestWithNextHighest()
+    {
+        var service = new PdfPairMatchingService(new ScaleCalculationService());
+        var result = service.MatchPairs(
+        [
+            Metadata("too-tall.pdf", 100, 1200),
+            Metadata("next.pdf", 100, 500),
+            Metadata("middle.pdf", 100, 400),
+            Metadata("shortest.pdf", 100, 100)
+        ]);
+
+        var pair = Assert.Single(result.Pairs);
+        Assert.Equal("next", pair.FirstPdf.FileName);
+        Assert.Equal("shortest", pair.SecondPdf.FileName);
+        Assert.Collection(
+            result.StandalonePdfs,
+            item =>
+            {
+                Assert.Equal("too-tall", item.Pdf.FileName);
+                Assert.Contains("放回队列", item.Reason, StringComparison.Ordinal);
+            },
+            item => Assert.Equal("middle", item.Pdf.FileName));
+    }
+
+    [Fact]
+    public void CalculateScales_DoesNotReserveAnExtraGap()
+    {
+        var service = new ScaleCalculationService();
+
+        var result = service.CalculateScales(
+            Metadata("long.pdf", 100, 600),
+            Metadata("short.pdf", 100, 242));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(1.0, result.FirstScale);
+        Assert.Equal(1.0, result.SecondScale);
+    }
+
+    [Fact]
+    public void CalculateScales_UsesHeightOnlyLikeTheReferenceAlgorithm()
+    {
+        var service = new ScaleCalculationService();
+
+        var result = service.CalculateScales(
+            Metadata("wide.pdf", 1000, 400),
+            Metadata("normal.pdf", 100, 300));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(1.0, result.FirstScale);
+        Assert.Equal(1.0, result.SecondScale);
+    }
+
+    [Fact]
+    public void CalculateScales_PrioritizesTheShorterInvoiceScale()
+    {
+        var service = new ScaleCalculationService();
+
+        var result = service.CalculateScales(
+            Metadata("long.pdf", 100, 700),
+            Metadata("short.pdf", 100, 300));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(0.77, result.FirstScale, 2);
+        Assert.Equal(1.0, result.SecondScale);
+    }
+
+    [Fact]
+    public async Task MergeAsync_WhenPairScalingFails_FallsBackAndLogsConcreteReason()
     {
         var source = CreateDirectory("scale-failure-source");
         var output = CreateDirectory("scale-failure-output");
-        var tooWidePath = CreatePdf(source, "too-wide.pdf");
+        var tooTallPath = CreatePdf(source, "too-tall.pdf");
         var normalPath = CreatePdf(source, "normal.pdf");
         var logSink = new FakeLogSink();
         var orchestrator = CreateOrchestrator(
             new Dictionary<string, PdfMetadata>
             {
-                [tooWidePath] = Metadata(tooWidePath, 900, 500),
+                [tooTallPath] = Metadata(tooTallPath, 200, 1100),
                 [normalPath] = Metadata(normalPath, 200, 200)
             },
             new FakePrintingService(),
@@ -84,13 +151,45 @@ public sealed class ProcessingOrchestratorTests : IDisposable
 
         var result = await orchestrator.MergeAsync(source, output);
 
-        Assert.Equal(1, result.MergeFailed);
+        Assert.Equal(0, result.MergeFailed);
+        Assert.Empty(result.PairResults);
+        Assert.Equal(2, result.StandaloneResults.Count);
+        Assert.All(result.StandaloneResults, item => Assert.True(item.IsSuccess));
         Assert.Contains(
             logSink.Messages,
-            message => message.Contains("缩放失败", StringComparison.Ordinal)
+            message => message.Contains("缩放匹配失败", StringComparison.Ordinal)
                 && message.Contains("原因", StringComparison.Ordinal)
                 && message.Contains("70%", StringComparison.Ordinal)
-                && message.Contains("A4", StringComparison.Ordinal));
+                && message.Contains("放回队列", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task MergeAsync_WhenStandaloneCreationFails_LogsTheServiceReason()
+    {
+        var source = CreateDirectory("standalone-failure-source");
+        var output = CreateDirectory("standalone-failure-output");
+        var tooTallPath = CreatePdf(source, "too-tall.pdf");
+        var normalPath = CreatePdf(source, "normal.pdf");
+        var logSink = new FakeLogSink();
+        var orchestrator = CreateOrchestrator(
+            new Dictionary<string, PdfMetadata>
+            {
+                [tooTallPath] = Metadata(tooTallPath, 200, 1100),
+                [normalPath] = Metadata(normalPath, 200, 200)
+            },
+            new FakePrintingService(),
+            new FailedMergingService(),
+            logSink);
+
+        var result = await orchestrator.MergeAsync(source, output);
+
+        Assert.True(result.HasFailures);
+        Assert.Equal(2, result.StandaloneResults.Count);
+        Assert.All(result.StandaloneResults, item => Assert.False(item.IsSuccess));
+        Assert.Contains(
+            logSink.Messages,
+            message => message.Contains("单独成页失败", StringComparison.Ordinal)
+                && message.Contains("测试单独成页失败原因", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -138,6 +237,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         var tallestPath = CreatePdf(source, "tallest.pdf");
         var middlePath = CreatePdf(source, "middle.pdf");
         var shortestPath = CreatePdf(source, "shortest.pdf");
+        File.WriteAllText(Path.Combine(output, "single_tallest.pdf"), "existing");
         var orchestrator = CreateOrchestrator(
             new Dictionary<string, PdfMetadata>
             {
@@ -150,7 +250,11 @@ public sealed class ProcessingOrchestratorTests : IDisposable
 
         var result = await orchestrator.MergeAsync(source, output);
 
-        Assert.Equal(tallestPath, result.StandalonePdf?.Path);
+        var standalone = Assert.Single(result.StandaloneResults);
+        Assert.True(standalone.IsSuccess);
+        Assert.Equal("tallest.pdf", standalone.SourceFileName);
+        Assert.Equal(Path.Combine(output, "single_tallest.pdf"), standalone.OutputPath);
+        Assert.Equal("standalone", File.ReadAllText(standalone.OutputPath));
         Assert.Equal(1, result.PairCount);
         var pairResult = Assert.Single(result.PairResults);
         Assert.Equal("middle.pdf", pairResult.FirstFileName);
@@ -298,8 +402,7 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         ILogSink? logSink = null) =>
         new(
             new FakeMetadataService(metadata),
-            new PdfPairMatchingService(),
-            new ScaleCalculationService(),
+            new PdfPairMatchingService(new ScaleCalculationService()),
             mergingService,
             printingService,
             logSink ?? new FakeLogSink());
@@ -353,6 +456,17 @@ public sealed class ProcessingOrchestratorTests : IDisposable
             File.WriteAllText(outputPath, "merged");
             return Task.FromResult(PdfMergeResult.Success());
         }
+
+        public Task<PdfMergeResult> CreateStandaloneAsync(
+            string pdfPath,
+            double scale,
+            string outputPath,
+            CancellationToken ct = default)
+        {
+            ct.ThrowIfCancellationRequested();
+            File.WriteAllText(outputPath, "standalone");
+            return Task.FromResult(PdfMergeResult.Success());
+        }
     }
 
     private sealed class FailedMergingService : IPdfMergingService
@@ -365,6 +479,13 @@ public sealed class ProcessingOrchestratorTests : IDisposable
             string outputPath,
             CancellationToken ct = default) =>
             Task.FromResult(PdfMergeResult.Failure("测试合并失败原因"));
+
+        public Task<PdfMergeResult> CreateStandaloneAsync(
+            string pdfPath,
+            double scale,
+            string outputPath,
+            CancellationToken ct = default) =>
+            Task.FromResult(PdfMergeResult.Failure("测试单独成页失败原因"));
     }
 
     private sealed class FakePrintingService : IPdfPrintingService

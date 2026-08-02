@@ -66,47 +66,77 @@
                 </Grid>
             </Border>
 
-            <Border IsVisible="{Binding HasStandalonePdf}"
-                    Margin="18,18,18,0"
-                    Background="{StaticResource BrushWarningSoft}"
-                    BorderBrush="#E7C56A"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="16,13">
-                <Grid ColumnDefinitions="42,*,Auto" ColumnSpacing="13">
-                    <Border Grid.Column="0"
-                            Width="42"
-                            Height="42"
-                            CornerRadius="7"
-                            Background="#22A26B00">
-                        <PathIcon Data="{StaticResource IconFile}"
-                                  Foreground="{StaticResource BrushWarning}"
-                                  Width="18"
-                                  Height="18"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center" />
-                    </Border>
-                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                        <TextBlock Text="最高 PDF · 单独打印"
-                                   FontSize="10.5"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource BrushWarning}" />
-                        <TextBlock Text="{Binding StandalonePdfFileName}"
-                                   ToolTip.Tip="{Binding StandalonePdfPath}"
-                                   TextWrapping="Wrap"
-                                   TextTrimming="CharacterEllipsis"
-                                   MaxLines="2"
-                                   FontSize="13"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource BrushInk}" />
-                    </StackPanel>
-                    <TextBlock Grid.Column="2"
-                               Text="文件总数为奇数，不参与合并"
-                               VerticalAlignment="Center"
-                               FontSize="11.5"
-                               Foreground="{StaticResource BrushWarning}" />
-                </Grid>
-            </Border>
+            <ItemsControl IsVisible="{Binding HasStandaloneResults}"
+                          ItemsSource="{Binding StandaloneResults}"
+                          Margin="18,18,18,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="10" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="models:StandalonePdfResult">
+                        <Border Background="{StaticResource BrushWarningSoft}"
+                                BorderBrush="#E7C56A"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,13">
+                            <Grid ColumnDefinitions="42,*" ColumnSpacing="13">
+                                <Border Grid.Column="0"
+                                        Width="42"
+                                        Height="42"
+                                        CornerRadius="7"
+                                        Background="#22A26B00"
+                                        VerticalAlignment="Top">
+                                    <PathIcon Data="{StaticResource IconFile}"
+                                              Foreground="{StaticResource BrushWarning}"
+                                              Width="18"
+                                              Height="18"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                        <TextBlock Text="单独 A4 成页"
+                                                   FontSize="10.5"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource BrushWarning}" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding StatusText}"
+                                                   FontSize="10.5"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource BrushWarning}" />
+                                    </Grid>
+                                    <TextBlock Text="{Binding SourceFileName}"
+                                               ToolTip.Tip="{Binding SourceFileName}"
+                                               TextWrapping="Wrap"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxLines="2"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource BrushInk}" />
+                                    <TextBlock Text="{Binding OutputFileName, StringFormat='输出：{0}'}"
+                                               ToolTip.Tip="{Binding OutputPath}"
+                                               TextWrapping="Wrap"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxLines="2"
+                                               FontSize="11.5"
+                                               Foreground="{StaticResource BrushInkSecondary}" />
+                                    <TextBlock Text="{Binding Reason}"
+                                               TextWrapping="Wrap"
+                                               FontSize="11.5"
+                                               Foreground="{StaticResource BrushWarning}" />
+                                    <TextBlock Text="{Binding ErrorMessage}"
+                                               IsVisible="{Binding !IsSuccess}"
+                                               TextWrapping="Wrap"
+                                               FontSize="11.5"
+                                               Foreground="{StaticResource BrushDanger}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
             <ItemsControl IsVisible="{Binding HasPairResults}"
                           ItemsSource="{Binding MergeResults}"

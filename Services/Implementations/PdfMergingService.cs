@@ -57,20 +57,18 @@ public sealed class PdfMergingService : IPdfMergingService
                 var scaledWidth2 = width2 * scale2;
                 var scaledHeight2 = height2 * scale2;
 
-                // 将两张缩放后的 PDF 作为一个整体在 A4 页面居中拼接。
-                var contentHeight = scaledHeight1 + PdfConstants.Spacing + scaledHeight2;
-                var startY = (PdfConstants.A4Height - contentHeight) / 2;
-
+                // 与 smart_printer.py 一致：长发票贴齐顶部，短发票贴齐底部，
+                // 只做水平居中，不额外添加固定间距。
                 var rect1 = new XRect(
                     (PdfConstants.A4Width - scaledWidth1) / 2,
-                    startY,
+                    0,
                     scaledWidth1,
                     scaledHeight1);
                 gfx.DrawImage(form1, rect1);
 
                 var rect2 = new XRect(
                     (PdfConstants.A4Width - scaledWidth2) / 2,
-                    startY + scaledHeight1 + PdfConstants.Spacing,
+                    PdfConstants.A4Height - scaledHeight2,
                     scaledWidth2,
                     scaledHeight2);
                 gfx.DrawImage(form2, rect2);
@@ -94,6 +92,60 @@ public sealed class PdfMergingService : IPdfMergingService
         {
             form2?.Dispose();
             form1?.Dispose();
+            outputDocument?.Dispose();
+        }
+    }
+
+    public async Task<PdfMergeResult> CreateStandaloneAsync(
+        string pdfPath, double scale,
+        string outputPath, CancellationToken ct = default)
+    {
+        PdfDocument outputDocument = null!;
+        XPdfForm? form = null;
+
+        try
+        {
+            return await Task.Run(() =>
+            {
+                ct.ThrowIfCancellationRequested();
+
+                form = XPdfForm.FromFile(pdfPath);
+                if (form.Page == null)
+                    return PdfMergeResult.Failure("文件没有可绘制的 PDF 页面");
+
+                outputDocument = new PdfDocument();
+                var page = outputDocument.AddPage();
+                page.Width = XUnit.FromPoint(PdfConstants.A4Width);
+                page.Height = XUnit.FromPoint(PdfConstants.A4Height);
+
+                using var gfx = XGraphics.FromPdfPage(page);
+                var scaledWidth = form.Page.Width.Point * scale;
+                var scaledHeight = form.Page.Height.Point * scale;
+                var rect = new XRect(
+                    (PdfConstants.A4Width - scaledWidth) / 2,
+                    0,
+                    scaledWidth,
+                    scaledHeight);
+                gfx.DrawImage(form, rect);
+
+                outputDocument.Save(outputPath);
+                _logger.LogDebug("单独成页成功: {OutputPath}", outputPath);
+                return PdfMergeResult.Success();
+            }, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("单独成页操作已取消");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "单独成页失败: {Pdf}", pdfPath);
+            return PdfMergeResult.Failure(ex.Message);
+        }
+        finally
+        {
+            form?.Dispose();
             outputDocument?.Dispose();
         }
     }
