@@ -1,9 +1,9 @@
-using SmartInvoicePrintingTool.Models;
-using SmartInvoicePrintingTool.Services.Abstractions;
-using SmartInvoicePrintingTool.Services.Implementations;
+using InvoicePress.Models;
+using InvoicePress.Services.Abstractions;
+using InvoicePress.Services.Implementations;
 using Xunit;
 
-namespace SmartInvoicePrintingTool.Tests;
+namespace InvoicePress.Tests;
 
 public sealed class ProcessingOrchestratorTests : IDisposable
 {

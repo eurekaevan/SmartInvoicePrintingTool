@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace SmartInvoicePrintingTool;
+namespace InvoicePress;
 
 sealed class Program
 {

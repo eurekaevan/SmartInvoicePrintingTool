@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using SmartInvoicePrintingTool.Models;
-using SmartInvoicePrintingTool.Services.Abstractions;
+using InvoicePress.Models;
+using InvoicePress.Services.Abstractions;
 // 使用别名避开命名冲突
-using MyPdfMetadata = SmartInvoicePrintingTool.Models.PdfMetadata;
+using MyPdfMetadata = InvoicePress.Models.PdfMetadata;
 
-namespace SmartInvoicePrintingTool.Services.Implementations;
+namespace InvoicePress.Services.Implementations;
 
 public sealed class PdfMetadataService : IPdfMetadataService
 {

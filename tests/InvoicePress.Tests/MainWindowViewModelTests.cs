@@ -1,9 +1,9 @@
-using SmartInvoicePrintingTool.Models;
-using SmartInvoicePrintingTool.Services.Abstractions;
-using SmartInvoicePrintingTool.ViewModels;
+using InvoicePress.Models;
+using InvoicePress.Services.Abstractions;
+using InvoicePress.ViewModels;
 using Xunit;
 
-namespace SmartInvoicePrintingTool.Tests;
+namespace InvoicePress.Tests;
 
 public sealed class MainWindowViewModelTests : IDisposable
 {

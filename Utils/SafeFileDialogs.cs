@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 
-namespace SmartInvoicePrintingTool.Utils;
+namespace InvoicePress.Utils;
 
 public class SafeFileDialogs
 {

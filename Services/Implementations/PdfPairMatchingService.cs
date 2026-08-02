@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SmartInvoicePrintingTool.Models;
-using SmartInvoicePrintingTool.Services.Abstractions;
+using InvoicePress.Models;
+using InvoicePress.Services.Abstractions;
 
-namespace SmartInvoicePrintingTool.Services.Implementations;
+namespace InvoicePress.Services.Implementations;
 
 public class PdfPairMatchingService : IPdfPairMatchingService
 {

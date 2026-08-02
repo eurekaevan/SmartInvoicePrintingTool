@@ -1,6 +1,6 @@
-# 智能发票合并打印工具
+# InvoicePress · 发票印擎
 
-基于 Avalonia UI 12 与 .NET 10 开发的桌面发票处理工具，用于批量识别、智能配对、合并排版和打印 PDF 发票。应用采用面向 PDF 生产流程的中文工作台界面。
+InvoicePress（中文名“发票印擎”）是基于 Avalonia UI 12 与 .NET 10 开发的桌面发票处理工具，用于批量识别、智能配对、合并排版和打印 PDF 发票。应用采用面向 PDF 生产流程的中文工作台界面。
 
 ## 核心功能
 
@@ -28,7 +28,7 @@
 ## 项目结构
 
 ```text
-SmartInvoicePrintingTool/
+InvoicePress/
 ├── Assets/                        # 应用资源
 ├── Models/                        # 领域模型
 ├── Services/                      # PDF 处理与打印服务
@@ -70,5 +70,5 @@ dotnet run
 ## 自动化测试
 
 ```bash
-dotnet test tests/SmartInvoicePrintingTool.Tests/SmartInvoicePrintingTool.Tests.csproj
+dotnet test tests/InvoicePress.Tests/InvoicePress.Tests.csproj
 ```

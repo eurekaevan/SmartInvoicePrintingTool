@@ -1,4 +1,4 @@
-namespace SmartInvoicePrintingTool.Models;
+namespace InvoicePress.Models;
 
 public sealed record PdfPrintSubmissionResult(bool IsSuccess, string? ErrorMessage)
 {

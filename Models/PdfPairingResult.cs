@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SmartInvoicePrintingTool.Models;
+namespace InvoicePress.Models;
 
 public sealed record PdfPairingResult(
     IReadOnlyList<PdfPair> Pairs,

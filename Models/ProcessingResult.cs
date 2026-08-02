@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SmartInvoicePrintingTool.Models;
+namespace InvoicePress.Models;
 
 public sealed record ProcessingResult(
     int InputCount,

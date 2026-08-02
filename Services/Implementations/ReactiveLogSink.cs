@@ -1,8 +1,8 @@
 using System;
 using Microsoft.Extensions.Logging;
-using SmartInvoicePrintingTool.Services.Abstractions;
+using InvoicePress.Services.Abstractions;
 
-namespace SmartInvoicePrintingTool.Services.Implementations;
+namespace InvoicePress.Services.Implementations;
 
 public class ReactiveLogSink : ILogSink
 {

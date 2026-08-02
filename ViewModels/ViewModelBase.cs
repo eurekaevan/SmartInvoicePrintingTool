@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace SmartInvoicePrintingTool.ViewModels;
+namespace InvoicePress.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject
 {

@@ -4,6 +4,11 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindows>true</UseWindows>
     <Nullable>enable</Nullable>
+    <AssemblyName>InvoicePress</AssemblyName>
+    <RootNamespace>InvoicePress</RootNamespace>
+    <Product>发票印擎</Product>
+    <Title>发票印擎</Title>
+    <Description>InvoicePress 发票 PDF 配对、合并与打印工具</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>

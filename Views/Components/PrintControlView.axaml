@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
-             x:Class="SmartInvoicePrintingTool.Views.Components.PrintControlView"
+             xmlns:vm="using:InvoicePress.ViewModels"
+             x:Class="InvoicePress.Views.Components.PrintControlView"
              x:DataType="vm:MainWindowViewModel">
     <Border Classes="workspace-card" Padding="24,22">
         <StackPanel Spacing="20">

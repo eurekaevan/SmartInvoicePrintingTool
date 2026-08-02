@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using SmartInvoicePrintingTool.Models;
-using SmartInvoicePrintingTool.Services.Abstractions;
-using SmartInvoicePrintingTool.Utils;
+using InvoicePress.Models;
+using InvoicePress.Services.Abstractions;
+using InvoicePress.Utils;
 
-namespace SmartInvoicePrintingTool.Services.Implementations;
+namespace InvoicePress.Services.Implementations;
 
 public sealed class PdfMergingService : IPdfMergingService
 {

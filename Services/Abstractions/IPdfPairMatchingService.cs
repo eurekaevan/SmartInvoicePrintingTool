@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using SmartInvoicePrintingTool.Models;
+using InvoicePress.Models;
 
-namespace SmartInvoicePrintingTool.Services.Abstractions;
+namespace InvoicePress.Services.Abstractions;
 
 public interface IPdfPairMatchingService
 {

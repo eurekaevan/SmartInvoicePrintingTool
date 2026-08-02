@@ -1,6 +1,6 @@
 using System;
 
-namespace SmartInvoicePrintingTool.Services.Abstractions;
+namespace InvoicePress.Services.Abstractions;
 
 public interface ILogSink
 {

@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using SmartInvoicePrintingTool.ViewModels;
-using SmartInvoicePrintingTool.Utils;
+using InvoicePress.ViewModels;
+using InvoicePress.Utils;
 
-namespace SmartInvoicePrintingTool.Views;
+namespace InvoicePress.Views;
 
 public partial class MainWindow : Window
 {

@@ -1,8 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
-             xmlns:models="using:SmartInvoicePrintingTool.Models"
-             x:Class="SmartInvoicePrintingTool.Views.Components.LogConsoleView"
+             xmlns:vm="using:InvoicePress.ViewModels"
+             xmlns:models="using:InvoicePress.Models"
+             x:Class="InvoicePress.Views.Components.LogConsoleView"
              x:DataType="vm:MainWindowViewModel">
     <Border Classes="workspace-card" Padding="0">
         <StackPanel>

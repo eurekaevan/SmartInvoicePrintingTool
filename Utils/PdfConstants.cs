@@ -1,4 +1,4 @@
-namespace SmartInvoicePrintingTool.Utils;
+namespace InvoicePress.Utils;
 
 public static class PdfConstants
 {

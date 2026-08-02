@@ -7,10 +7,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SmartInvoicePrintingTool.Models;
-using SmartInvoicePrintingTool.Services.Abstractions;
+using InvoicePress.Models;
+using InvoicePress.Services.Abstractions;
 
-namespace SmartInvoicePrintingTool.ViewModels;
+namespace InvoicePress.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {

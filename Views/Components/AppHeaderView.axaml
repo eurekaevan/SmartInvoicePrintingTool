@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:SmartInvoicePrintingTool.ViewModels"
-             x:Class="SmartInvoicePrintingTool.Views.Components.AppHeaderView"
+             xmlns:vm="using:InvoicePress.ViewModels"
+             x:Class="InvoicePress.Views.Components.AppHeaderView"
              x:DataType="vm:MainWindowViewModel">
     <Border Background="{StaticResource BrushHeader}"
             BorderBrush="#334158"
@@ -26,11 +26,11 @@
                 </Border>
 
                 <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-                    <TextBlock Text="智能发票处理工作台"
+                    <TextBlock Text="发票印擎"
                                FontSize="18"
                                FontWeight="SemiBold"
                                Foreground="White" />
-                    <TextBlock Text="配对、合并与打印"
+                    <TextBlock Text="InvoicePress · 配对、合并与打印"
                                FontSize="11.5"
                                Foreground="#AEB9C8" />
                 </StackPanel>

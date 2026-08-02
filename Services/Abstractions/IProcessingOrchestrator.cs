@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using SmartInvoicePrintingTool.Models;
+using InvoicePress.Models;
 
-namespace SmartInvoicePrintingTool.Services.Abstractions;
+namespace InvoicePress.Services.Abstractions;
 
 public interface IProcessingOrchestrator
 {

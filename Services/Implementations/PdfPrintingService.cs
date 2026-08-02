@@ -6,10 +6,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SmartInvoicePrintingTool.Models;
-using SmartInvoicePrintingTool.Services.Abstractions;
+using InvoicePress.Models;
+using InvoicePress.Services.Abstractions;
 
-namespace SmartInvoicePrintingTool.Services.Implementations;
+namespace InvoicePress.Services.Implementations;
 
 /// <summary>
 /// 使用 Windows 系统默认 PDF 打印服务。

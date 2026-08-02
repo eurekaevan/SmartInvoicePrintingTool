@@ -4,12 +4,12 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SmartInvoicePrintingTool.ViewModels;
-using SmartInvoicePrintingTool.Views;
-using SmartInvoicePrintingTool.Services.Abstractions;
-using SmartInvoicePrintingTool.Services.Implementations;
+using InvoicePress.ViewModels;
+using InvoicePress.Views;
+using InvoicePress.Services.Abstractions;
+using InvoicePress.Services.Implementations;
 
-namespace SmartInvoicePrintingTool;
+namespace InvoicePress;
 
 public partial class App : Application
 {

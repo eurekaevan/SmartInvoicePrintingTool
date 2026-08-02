@@ -1,9 +1,9 @@
 using System;
-using SmartInvoicePrintingTool.Models;
-using SmartInvoicePrintingTool.Services.Abstractions;
-using SmartInvoicePrintingTool.Utils;
+using InvoicePress.Models;
+using InvoicePress.Services.Abstractions;
+using InvoicePress.Utils;
 
-namespace SmartInvoicePrintingTool.Services.Implementations;
+namespace InvoicePress.Services.Implementations;
 
 public class ScaleCalculationService : IScaleCalculationService
 {

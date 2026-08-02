@@ -1,4 +1,4 @@
-namespace SmartInvoicePrintingTool.Models;
+namespace InvoicePress.Models;
 
 public sealed record PdfMergeResult(bool IsSuccess, string? ErrorMessage)
 {

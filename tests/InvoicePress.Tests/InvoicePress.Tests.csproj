@@ -18,6 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SmartInvoicePrintingTool.csproj" />
+    <ProjectReference Include="..\..\InvoicePress.csproj" />
   </ItemGroup>
 </Project>
