@@ -12,7 +12,7 @@
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Grid.Column="0" Spacing="4">
                         <TextBlock Text="03  核对结果" Classes="section-kicker" />
-                        <TextBlock Text="合并文件清单" Classes="section-title" />
+                        <TextBlock Text="PDF 处理清单" Classes="section-title" />
                         <TextBlock Text="{Binding MergeSummaryText}"
                                    Classes="body-muted" />
                     </StackPanel>
@@ -28,7 +28,7 @@
                                       Foreground="{StaticResource BrushSuccess}"
                                       Width="14"
                                       Height="14" />
-                            <TextBlock Text="{Binding SuccessfulMergeCount, StringFormat='{}{0} 份可打印'}"
+                            <TextBlock Text="{Binding PrintableFileCount, StringFormat='{}{0} 份可打印'}"
                                        FontSize="11.5"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource BrushSuccess}" />
@@ -66,7 +66,49 @@
                 </Grid>
             </Border>
 
-            <ItemsControl IsVisible="{Binding HasMergeResults}"
+            <Border IsVisible="{Binding HasStandalonePdf}"
+                    Margin="18,18,18,0"
+                    Background="{StaticResource BrushWarningSoft}"
+                    BorderBrush="#E7C56A"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16,13">
+                <Grid ColumnDefinitions="42,*,Auto" ColumnSpacing="13">
+                    <Border Grid.Column="0"
+                            Width="42"
+                            Height="42"
+                            CornerRadius="7"
+                            Background="#22A26B00">
+                        <PathIcon Data="{StaticResource IconFile}"
+                                  Foreground="{StaticResource BrushWarning}"
+                                  Width="18"
+                                  Height="18"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="最高 PDF · 单独打印"
+                                   FontSize="10.5"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushWarning}" />
+                        <TextBlock Text="{Binding StandalonePdfFileName}"
+                                   ToolTip.Tip="{Binding StandalonePdfPath}"
+                                   TextWrapping="Wrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxLines="2"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushInk}" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2"
+                               Text="文件总数为奇数，不参与合并"
+                               VerticalAlignment="Center"
+                               FontSize="11.5"
+                               Foreground="{StaticResource BrushWarning}" />
+                </Grid>
+            </Border>
+
+            <ItemsControl IsVisible="{Binding HasPairResults}"
                           ItemsSource="{Binding MergeResults}"
                           Margin="18">
                 <ItemsControl.ItemsPanel>

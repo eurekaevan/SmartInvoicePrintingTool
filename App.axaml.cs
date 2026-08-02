@@ -49,7 +49,6 @@ public partial class App : Application
 
         // 注册服务
         services.AddSingleton<IPdfMetadataService, PdfMetadataService>();
-        services.AddSingleton<IPdfClassificationService, PdfClassificationService>();
         services.AddSingleton<IPdfPairMatchingService, PdfPairMatchingService>();
         services.AddSingleton<IScaleCalculationService, ScaleCalculationService>();
         services.AddSingleton<IPdfMergingService, PdfMergingService>();

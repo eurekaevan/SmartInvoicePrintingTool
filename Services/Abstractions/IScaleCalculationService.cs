@@ -4,6 +4,6 @@ namespace SmartInvoicePrintingTool.Services.Abstractions;
 
 public interface IScaleCalculationService
 {
-    (double LongScale, double ShortScale)? CalculateScales(
-        PdfMetadata longPdf, PdfMetadata shortPdf);
+    (double FirstScale, double SecondScale)? CalculateScales(
+        PdfMetadata firstPdf, PdfMetadata secondPdf);
 }

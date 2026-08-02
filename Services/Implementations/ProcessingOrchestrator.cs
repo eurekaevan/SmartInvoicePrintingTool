@@ -12,7 +12,6 @@ namespace SmartInvoicePrintingTool.Services.Implementations;
 public class ProcessingOrchestrator : IProcessingOrchestrator
 {
     private readonly IPdfMetadataService _metadataService;
-    private readonly IPdfClassificationService _classificationService;
     private readonly IPdfPairMatchingService _pairMatchingService;
     private readonly IScaleCalculationService _scaleService;
     private readonly IPdfMergingService _mergingService;
@@ -21,7 +20,6 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
 
     public ProcessingOrchestrator(
         IPdfMetadataService metadataService,
-        IPdfClassificationService classificationService,
         IPdfPairMatchingService pairMatchingService,
         IScaleCalculationService scaleService,
         IPdfMergingService mergingService,
@@ -29,7 +27,6 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         ILogSink logSink)
     {
         _metadataService = metadataService ?? throw new ArgumentNullException(nameof(metadataService));
-        _classificationService = classificationService ?? throw new ArgumentNullException(nameof(classificationService));
         _pairMatchingService = pairMatchingService ?? throw new ArgumentNullException(nameof(pairMatchingService));
         _scaleService = scaleService ?? throw new ArgumentNullException(nameof(scaleService));
         _mergingService = mergingService ?? throw new ArgumentNullException(nameof(mergingService));
@@ -55,7 +52,7 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         {
             _logSink.Log("未找到有效的 PDF 文件");
             progress?.Report(100);
-            return new ProcessingResult(0, 0, 0, 0, 0, 0, []);
+            return new ProcessingResult(0, 0, 0, 0, 0, [], null);
         }
 
         // 2. 获取元数据
@@ -64,27 +61,31 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         {
             ct.ThrowIfCancellationRequested();
             var meta = await _metadataService.GetMetadataAsync(pdfPaths[i], ct);
-            if (meta != null) pdfs.Add(meta);
+            if (meta is { Width: > 0, Height: > 0 }) pdfs.Add(meta);
             progress?.Report((double)(i + 1) / pdfPaths.Length * 30);
         }
 
-        // 3. 分类
+        // 3. 按高度降序后高低互补配对；奇数时最高 PDF 保留为单独打印项
         ct.ThrowIfCancellationRequested();
-        var (longPdfs, shortPdfs) = _classificationService.ClassifyPdfs(pdfs);
-        _logSink.Log($"分类结果: 长PDF={longPdfs.Count}, 短PDF={shortPdfs.Count}");
+        var pairingResult = _pairMatchingService.MatchPairs(pdfs);
+        var pairs = pairingResult.Pairs;
+        var standalonePdf = pairingResult.StandalonePdf == null
+            ? null
+            : new StandalonePdfResult(
+                Path.GetFileName(pairingResult.StandalonePdf.Path),
+                pairingResult.StandalonePdf.Path);
+        _logSink.Log($"按高度高低互补匹配到 {pairs.Count} 对");
+        if (standalonePdf != null)
+            _logSink.Log($"文件数为奇数，最高 PDF 将单独打印: {standalonePdf.FileName}");
 
-        // 4. 配对
-        var pairs = _pairMatchingService.MatchPairs(longPdfs, shortPdfs);
-        var unpairedCount = pdfs.Count - pairs.Count * 2;
-        _logSink.Log($"匹配到 {pairs.Count} 对，未配对 {unpairedCount} 个");
-        if (pairs.Count == 0)
+        if (pairs.Count == 0 && standalonePdf == null)
         {
-            _logSink.Log("未配对到可合并的 PDF 文件组");
+            _logSink.Log("没有可处理的 PDF 文件");
             progress?.Report(100);
-            return new ProcessingResult(pdfPaths.Length, pdfs.Count, 0, unpairedCount, 0, 0, []);
+            return new ProcessingResult(pdfPaths.Length, pdfs.Count, 0, 0, 0, [], null);
         }
 
-        // 5. 计算缩放并合并
+        // 4. 计算缩放并合并
         int processed = 0;
         int mergeSucceeded = 0;
         int mergeFailed = 0;
@@ -93,13 +94,13 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         foreach (var pair in pairs)
         {
             ct.ThrowIfCancellationRequested();
-            var firstFileName = Path.GetFileName(pair.LongPdf.Path);
-            var secondFileName = Path.GetFileName(pair.ShortPdf.Path);
+            var firstFileName = Path.GetFileName(pair.FirstPdf.Path);
+            var secondFileName = Path.GetFileName(pair.SecondPdf.Path);
             var outputPath = Path.Combine(outputFolder, pair.OutputFileName);
-            var scales = _scaleService.CalculateScales(pair.LongPdf, pair.ShortPdf);
+            var scales = _scaleService.CalculateScales(pair.FirstPdf, pair.SecondPdf);
             if (scales == null)
             {
-                _logSink.Log($"缩放失败: {pair.LongPdf.FileName} + {pair.ShortPdf.FileName}");
+                _logSink.Log($"缩放失败: {pair.FirstPdf.FileName} + {pair.SecondPdf.FileName}");
                 mergeFailed++;
                 pairResults.Add(new MergeItemResult(
                     firstFileName,
@@ -113,15 +114,15 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
                 continue;
             }
 
-            pair.LongScale = scales.Value.LongScale;
-            pair.ShortScale = scales.Value.ShortScale;
+            pair.FirstScale = scales.Value.FirstScale;
+            pair.SecondScale = scales.Value.SecondScale;
 
             var temporaryPath = Path.Combine(outputFolder, $".{Guid.NewGuid():N}.tmp.pdf");
             try
             {
                 var merged = await _mergingService.MergeAsync(
-                    pair.LongPdf.Path, pair.LongScale,
-                    pair.ShortPdf.Path, pair.ShortScale,
+                    pair.FirstPdf.Path, pair.FirstScale,
+                    pair.SecondPdf.Path, pair.SecondScale,
                     temporaryPath, ct);
 
                 if (!merged)
@@ -178,10 +179,10 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             pdfPaths.Length,
             pdfs.Count,
             pairs.Count,
-            unpairedCount,
             mergeSucceeded,
             mergeFailed,
-            pairResults);
+            pairResults,
+            standalonePdf);
     }
 
     public async Task<PrintResult> PrintAsync(
@@ -196,12 +197,12 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         progress?.Report(0);
         if (pdfPaths.Count == 0)
         {
-            _logSink.Log("没有可打印的合并文件");
+            _logSink.Log("没有可打印的 PDF 文件");
             progress?.Report(100);
             return new PrintResult(0, 0, 0);
         }
 
-        _logSink.Log($"开始向 {printerName} 提交 {pdfPaths.Count} 个合并文件...");
+        _logSink.Log($"开始向 {printerName} 提交 {pdfPaths.Count} 个 PDF 文件...");
         var submitted = 0;
         var failed = 0;
 

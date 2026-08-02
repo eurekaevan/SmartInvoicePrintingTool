@@ -114,7 +114,7 @@
                                            FontSize="14"
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource BrushInk}" />
-                                <TextBlock Text="仅打印本次成功合并的文件"
+                                <TextBlock Text="打印合并文件以及奇数时的单独文件"
                                            Classes="body-muted"
                                            TextWrapping="Wrap" />
                             </StackPanel>
@@ -130,18 +130,18 @@
                         </StackPanel>
 
                         <Button Grid.Row="2"
-                                Command="{Binding PrintMergedFilesCommand}"
-                                IsEnabled="{Binding CanPrintMergedFiles}"
+                                Command="{Binding PrintResultsCommand}"
+                                IsEnabled="{Binding CanPrintResults}"
                                 Classes="command-secondary"
                                 Height="46"
                                 HorizontalAlignment="Stretch"
-                                ToolTip.Tip="仅打印本次成功合并的 PDF">
+                                ToolTip.Tip="打印本次成功合并的 PDF 和需单独打印的 PDF">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <PathIcon Data="{StaticResource IconPrinter}"
                                           Foreground="White"
                                           Width="16"
                                           Height="16" />
-                                <TextBlock Text="打印合并结果" />
+                                <TextBlock Text="打印处理结果" />
                             </StackPanel>
                         </Button>
                     </Grid>

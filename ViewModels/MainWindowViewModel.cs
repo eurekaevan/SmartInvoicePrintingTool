@@ -36,14 +36,22 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public bool HasNoLogEntries => !HasLogEntries;
     public int LogEntryCount => LogEntries.Count;
     public ObservableCollection<MergeItemResult> MergeResults { get; } = new();
-    public bool HasMergeResults => MergeResults.Count > 0;
+    [ObservableProperty] private StandalonePdfResult? _standalonePdf;
+    public bool HasStandalonePdf => StandalonePdf != null;
+    public string StandalonePdfFileName => StandalonePdf?.FileName ?? string.Empty;
+    public string StandalonePdfPath => StandalonePdf?.Path ?? string.Empty;
+    public bool HasPairResults => MergeResults.Count > 0;
+    public bool HasMergeResults => MergeResults.Count > 0 || HasStandalonePdf;
     public bool HasNoMergeResults => !HasMergeResults;
     public int SuccessfulMergeCount => MergeResults.Count(item => item.IsSuccess);
+    public int PrintableFileCount => SuccessfulMergeCount + (HasStandalonePdf ? 1 : 0);
     public string MergeSummaryText => HasMergeResults
-        ? $"本次共 {MergeResults.Count} 组，成功 {SuccessfulMergeCount} 组"
+        ? HasStandalonePdf
+            ? $"本次 {MergeResults.Count} 组配对，成功 {SuccessfulMergeCount} 组，1 份单独打印"
+            : $"本次 {MergeResults.Count} 组配对，成功 {SuccessfulMergeCount} 组"
         : "合并完成后将在这里显示文件配对";
-    public bool CanPrintMergedFiles =>
-        !IsBusy && SuccessfulMergeCount > 0 && !string.IsNullOrWhiteSpace(SelectedPrinter);
+    public bool CanPrintResults =>
+        !IsBusy && PrintableFileCount > 0 && !string.IsNullOrWhiteSpace(SelectedPrinter);
 
     // 打印机相关
     public ObservableCollection<string> Printers { get; } = new();
@@ -64,11 +72,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     partial void OnIsBusyChanged(bool value)
     {
         OnPropertyChanged(nameof(SystemStatusText));
-        OnPropertyChanged(nameof(CanPrintMergedFiles));
+        OnPropertyChanged(nameof(CanPrintResults));
     }
 
     partial void OnSelectedPrinterChanged(string? value) =>
-        OnPropertyChanged(nameof(CanPrintMergedFiles));
+        OnPropertyChanged(nameof(CanPrintResults));
 
     public async Task InitializeAsync()
     {
@@ -146,6 +154,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         ProgressValue = 0;
         StatusMessage = "正在扫描并合并 PDF，可点击“停止当前任务”取消。";
         MergeResults.Clear();
+        StandalonePdf = null;
         NotifyMergeResultsChanged();
 
         try
@@ -159,6 +168,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             foreach (var item in result.PairResults)
                 MergeResults.Add(item);
 
+            StandalonePdf = result.StandalonePdf;
             NotifyMergeResultsChanged();
             StatusMessage = FormatMergeResult(result);
         }
@@ -180,17 +190,20 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     }
 
     [RelayCommand]
-    private async Task PrintMergedFiles()
+    private async Task PrintResults()
     {
         if (IsBusy) return;
 
         var pdfPaths = MergeResults
             .Where(item => item.IsSuccess)
             .Select(item => item.OutputPath)
-            .ToArray();
-        if (pdfPaths.Length == 0)
+            .ToList();
+        if (StandalonePdf != null)
+            pdfPaths.Add(StandalonePdf.Path);
+
+        if (pdfPaths.Count == 0)
         {
-            StatusMessage = "请先完成至少一组 PDF 合并。";
+            StatusMessage = "请先完成 PDF 配对处理。";
             return;
         }
 
@@ -205,7 +218,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         IsBusy = true;
         IsCancellable = true;
         ProgressValue = 0;
-        StatusMessage = $"正在提交 {pdfPaths.Length} 份合并文件到打印机…";
+        StatusMessage = $"正在提交 {pdfPaths.Count} 份 PDF 到打印机…";
 
         try
         {
@@ -279,25 +292,34 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         if (result.InputCount == 0)
             return "未找到 PDF 文件。";
-        if (result.PairCount == 0)
+        if (result.PairCount == 0 && result.StandalonePdf == null)
             return "未找到可合并的 PDF 配对。";
+        if (result.PairCount == 0)
+            return $"共有 1 份 PDF，将单独打印：{result.StandalonePdf!.FileName}。";
         if (result.HasFailures)
             return $"合并完成但有部分失败：成功 {result.MergeSucceeded} 组，失败 {result.MergeFailed} 组。";
 
-        return $"合并完成：成功生成 {result.MergeSucceeded} 份 PDF，可在下方查看文件配对。";
+        return result.StandalonePdf == null
+            ? $"合并完成：成功生成 {result.MergeSucceeded} 份 PDF。"
+            : $"合并完成：生成 {result.MergeSucceeded} 份合并 PDF，1 份最高 PDF 将单独打印。";
     }
 
     private static string FormatPrintResult(PrintResult result) => result.HasFailures
         ? $"打印提交完成但有部分失败：已提交 {result.Submitted} 份，失败 {result.Failed} 份。"
-        : $"已将 {result.Submitted} 份合并 PDF 提交到打印机。";
+        : $"已将 {result.Submitted} 份 PDF 提交到打印机。";
 
     private void NotifyMergeResultsChanged()
     {
         OnPropertyChanged(nameof(HasMergeResults));
         OnPropertyChanged(nameof(HasNoMergeResults));
+        OnPropertyChanged(nameof(HasStandalonePdf));
+        OnPropertyChanged(nameof(StandalonePdfFileName));
+        OnPropertyChanged(nameof(StandalonePdfPath));
+        OnPropertyChanged(nameof(HasPairResults));
         OnPropertyChanged(nameof(SuccessfulMergeCount));
+        OnPropertyChanged(nameof(PrintableFileCount));
         OnPropertyChanged(nameof(MergeSummaryText));
-        OnPropertyChanged(nameof(CanPrintMergedFiles));
+        OnPropertyChanged(nameof(CanPrintResults));
     }
 
     private void NotifyLogEntriesChanged()

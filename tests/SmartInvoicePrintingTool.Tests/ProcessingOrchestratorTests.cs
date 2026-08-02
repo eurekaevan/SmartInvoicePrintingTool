@@ -10,6 +10,61 @@ public sealed class ProcessingOrchestratorTests : IDisposable
     private readonly string _testRoot = Path.Combine(Path.GetTempPath(), $"invoice-tool-tests-{Guid.NewGuid():N}");
 
     [Fact]
+    public void MatchPairs_WhenCountIsEven_PairsHighestWithLowest()
+    {
+        var service = new PdfPairMatchingService();
+        var result = service.MatchPairs(
+        [
+            Metadata("100.pdf", 100, 100),
+            Metadata("400.pdf", 100, 400),
+            Metadata("200.pdf", 100, 200),
+            Metadata("300.pdf", 100, 300)
+        ]);
+
+        Assert.Null(result.StandalonePdf);
+        Assert.Collection(
+            result.Pairs,
+            pair =>
+            {
+                Assert.Equal("400", pair.FirstPdf.FileName);
+                Assert.Equal("100", pair.SecondPdf.FileName);
+            },
+            pair =>
+            {
+                Assert.Equal("300", pair.FirstPdf.FileName);
+                Assert.Equal("200", pair.SecondPdf.FileName);
+            });
+    }
+
+    [Fact]
+    public void MatchPairs_WhenCountIsOdd_LeavesTallestPdfForStandalonePrinting()
+    {
+        var service = new PdfPairMatchingService();
+        var result = service.MatchPairs(
+        [
+            Metadata("second.pdf", 100, 400),
+            Metadata("tallest.pdf", 100, 500),
+            Metadata("middle.pdf", 100, 300),
+            Metadata("second-shortest.pdf", 100, 200),
+            Metadata("shortest.pdf", 100, 100)
+        ]);
+
+        Assert.Equal("tallest", result.StandalonePdf?.FileName);
+        Assert.Collection(
+            result.Pairs,
+            pair =>
+            {
+                Assert.Equal("second", pair.FirstPdf.FileName);
+                Assert.Equal("shortest", pair.SecondPdf.FileName);
+            },
+            pair =>
+            {
+                Assert.Equal("middle", pair.FirstPdf.FileName);
+                Assert.Equal("second-shortest", pair.SecondPdf.FileName);
+            });
+    }
+
+    [Fact]
     public async Task MergeAsync_ReplacesExistingOutput_ReportsProgress_AndReturnsPairDetails()
     {
         var source = CreateDirectory("source");
@@ -44,6 +99,33 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         Assert.All(progressValues, value => Assert.InRange(value, 0, 100));
         Assert.Equal(0, progressValues.First());
         Assert.Equal(100, progressValues.Last());
+    }
+
+    [Fact]
+    public async Task MergeAsync_WhenCountIsOdd_ReturnsTallestPdfAsStandalonePrintItem()
+    {
+        var source = CreateDirectory("odd-source");
+        var output = CreateDirectory("odd-output");
+        var tallestPath = CreatePdf(source, "tallest.pdf");
+        var middlePath = CreatePdf(source, "middle.pdf");
+        var shortestPath = CreatePdf(source, "shortest.pdf");
+        var orchestrator = CreateOrchestrator(
+            new Dictionary<string, PdfMetadata>
+            {
+                [tallestPath] = Metadata(tallestPath, 100, 700),
+                [middlePath] = Metadata(middlePath, 100, 400),
+                [shortestPath] = Metadata(shortestPath, 100, 200)
+            },
+            new FakePrintingService(),
+            new SuccessfulMergingService());
+
+        var result = await orchestrator.MergeAsync(source, output);
+
+        Assert.Equal(tallestPath, result.StandalonePdf?.Path);
+        Assert.Equal(1, result.PairCount);
+        var pairResult = Assert.Single(result.PairResults);
+        Assert.Equal("middle.pdf", pairResult.FirstFileName);
+        Assert.Equal("shortest.pdf", pairResult.SecondFileName);
     }
 
     [Fact]
@@ -138,7 +220,6 @@ public sealed class ProcessingOrchestratorTests : IDisposable
         IPdfMergingService mergingService) =>
         new(
             new FakeMetadataService(metadata),
-            new PdfClassificationService(),
             new PdfPairMatchingService(),
             new ScaleCalculationService(),
             mergingService,

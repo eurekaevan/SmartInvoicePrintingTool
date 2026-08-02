@@ -6,10 +6,10 @@ public sealed record ProcessingResult(
     int InputCount,
     int ValidPdfCount,
     int PairCount,
-    int UnpairedCount,
     int MergeSucceeded,
     int MergeFailed,
-    IReadOnlyList<MergeItemResult> PairResults)
+    IReadOnlyList<MergeItemResult> PairResults,
+    StandalonePdfResult? StandalonePdf)
 {
     public bool HasFailures => MergeFailed > 0;
 }
