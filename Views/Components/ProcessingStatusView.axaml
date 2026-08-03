@@ -3,23 +3,23 @@
              xmlns:vm="using:InvoicePress.ViewModels"
              x:Class="InvoicePress.Views.Components.ProcessingStatusView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="workspace-card" Padding="18,16">
-        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+    <Border Classes="workspace-card" Padding="15,12">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
             <Border Grid.Column="0"
-                    Width="38"
-                    Height="38"
+                    Width="34"
+                    Height="34"
                     CornerRadius="7"
                     Background="{StaticResource BrushBrandSoft}"
                     VerticalAlignment="Center">
                 <PathIcon Data="{StaticResource IconActivity}"
                           Foreground="{StaticResource BrushBrand}"
-                          Width="18"
-                          Height="18"
+                          Width="16"
+                          Height="16"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center" />
             </Border>
 
-            <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+            <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock Grid.Column="0"
                                Text="{Binding StatusMessage}"
@@ -41,7 +41,7 @@
                              Maximum="100"
                              Height="5"
                              CornerRadius="2.5"
-                             Background="#E7EBF0"
+                             Background="{StaticResource BrushLine}"
                              Foreground="{StaticResource BrushBrand}" />
             </StackPanel>
 

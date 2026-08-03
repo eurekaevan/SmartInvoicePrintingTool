@@ -3,8 +3,8 @@
              xmlns:vm="using:InvoicePress.ViewModels"
              x:Class="InvoicePress.Views.Components.DirectorySetupView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="workspace-card" Padding="24,22">
-        <StackPanel Spacing="20">
+    <Border Classes="workspace-card" Padding="20,16">
+        <StackPanel Spacing="14">
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Spacing="4">
                     <TextBlock Text="01  文件准备" Classes="section-kicker" />
@@ -17,7 +17,7 @@
                 <Border Grid.Column="1"
                         Background="{StaticResource BrushWarningSoft}"
                         CornerRadius="6"
-                        Padding="11,7"
+                        Padding="10,6"
                         VerticalAlignment="Top">
                     <TextBlock Text="同名输出自动替换"
                                FontSize="11"
@@ -26,14 +26,14 @@
                 </Border>
             </Grid>
 
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                 <Border Grid.Column="0"
                         Background="{StaticResource BrushSurfaceSubtle}"
                         BorderBrush="{StaticResource BrushLine}"
                         BorderThickness="1"
                         CornerRadius="8"
-                        Padding="16">
-                    <StackPanel Spacing="10">
+                        Padding="13">
+                    <StackPanel Spacing="8">
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
                             <PathIcon Grid.Column="0"
                                       Data="{StaticResource IconFolder}"
@@ -42,12 +42,12 @@
                                       Height="16" />
                             <TextBlock Grid.Column="1" Text="源 PDF 目录" Classes="field-label" />
                         </Grid>
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                             <TextBox Grid.Column="0"
                                      Text="{Binding SourcePath}"
                                      PlaceholderText="选择包含待处理 PDF 的文件夹"
                                      IsReadOnly="True"
-                                     Height="44"
+                                     Height="40"
                                      Padding="12,0"
                                      VerticalContentAlignment="Center"
                                      ToolTip.Tip="{Binding SourcePath}" />
@@ -56,8 +56,8 @@
                                     Command="{Binding BrowseSourceCommand}"
                                     IsEnabled="{Binding !IsBusy}"
                                     Classes="browse-button"
-                                    MinWidth="76"
-                                    Height="42" />
+                                    MinWidth="72"
+                                    Height="38" />
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -67,8 +67,8 @@
                         BorderBrush="{StaticResource BrushLine}"
                         BorderThickness="1"
                         CornerRadius="8"
-                        Padding="16">
-                    <StackPanel Spacing="10">
+                        Padding="13">
+                    <StackPanel Spacing="8">
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
                             <PathIcon Grid.Column="0"
                                       Data="{StaticResource IconFile}"
@@ -77,12 +77,12 @@
                                       Height="16" />
                             <TextBlock Grid.Column="1" Text="合并输出目录" Classes="field-label" />
                         </Grid>
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                             <TextBox Grid.Column="0"
                                      Text="{Binding OutputPath}"
                                      PlaceholderText="选择合并 PDF 的保存文件夹"
                                      IsReadOnly="True"
-                                     Height="44"
+                                     Height="40"
                                      Padding="12,0"
                                      VerticalContentAlignment="Center"
                                      ToolTip.Tip="{Binding OutputPath}" />
@@ -91,8 +91,8 @@
                                     Command="{Binding BrowseOutputCommand}"
                                     IsEnabled="{Binding !IsBusy}"
                                     Classes="browse-button"
-                                    MinWidth="76"
-                                    Height="42" />
+                                    MinWidth="72"
+                                    Height="38" />
                         </Grid>
                     </StackPanel>
                 </Border>

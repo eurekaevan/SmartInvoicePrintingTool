@@ -3,8 +3,8 @@
              xmlns:vm="using:InvoicePress.ViewModels"
              x:Class="InvoicePress.Views.Components.PrintControlView"
              x:DataType="vm:MainWindowViewModel">
-    <Border Classes="workspace-card" Padding="24,22">
-        <StackPanel Spacing="20">
+    <Border Classes="workspace-card" Padding="20,16">
+        <StackPanel Spacing="14">
             <StackPanel Spacing="4">
                 <TextBlock Text="02  执行任务" Classes="section-kicker" />
                 <TextBlock Text="先生成，后打印" Classes="section-title" />
@@ -13,19 +13,19 @@
                            TextWrapping="Wrap" />
             </StackPanel>
 
-            <Grid ColumnDefinitions="*,40,*">
+            <Grid ColumnDefinitions="*,32,*">
                 <Border Grid.Column="0"
                         Background="{StaticResource BrushBrandSoft}"
                         BorderBrush="#C9D5FA"
                         BorderThickness="1"
                         CornerRadius="8"
-                        Padding="18">
-                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="15">
-                        <Grid Grid.Row="0" ColumnDefinitions="36,*" ColumnSpacing="11">
+                        Padding="15">
+                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+                        <Grid Grid.Row="0" ColumnDefinitions="32,*" ColumnSpacing="10">
                             <Border Grid.Column="0"
-                                    Width="36"
-                                    Height="36"
-                                    CornerRadius="18"
+                                    Width="32"
+                                    Height="32"
+                                    CornerRadius="16"
                                     Background="{StaticResource BrushBrand}">
                                 <TextBlock Text="1"
                                            HorizontalAlignment="Center"
@@ -54,7 +54,7 @@
                                 Command="{Binding StartMergingCommand}"
                                 IsEnabled="{Binding !IsBusy}"
                                 Classes="command-primary"
-                                Height="46"
+                                Height="42"
                                 HorizontalAlignment="Stretch">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <PathIcon Data="{StaticResource IconMerge}"
@@ -95,13 +95,13 @@
                         BorderBrush="{StaticResource BrushLine}"
                         BorderThickness="1"
                         CornerRadius="8"
-                        Padding="18">
-                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="15">
-                        <Grid Grid.Row="0" ColumnDefinitions="36,*" ColumnSpacing="11">
+                        Padding="15">
+                    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+                        <Grid Grid.Row="0" ColumnDefinitions="32,*" ColumnSpacing="10">
                             <Border Grid.Column="0"
-                                    Width="36"
-                                    Height="36"
-                                    CornerRadius="18"
+                                    Width="32"
+                                    Height="32"
+                                    CornerRadius="16"
                                     Background="{StaticResource BrushHeader}">
                                 <TextBlock Text="2"
                                            HorizontalAlignment="Center"
@@ -120,7 +120,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <StackPanel Grid.Row="1" Spacing="7">
+                        <StackPanel Grid.Row="1" Spacing="5">
                             <TextBlock Text="目标打印机" Classes="field-label" />
                             <ComboBox ItemsSource="{Binding Printers}"
                                       SelectedItem="{Binding SelectedPrinter}"
@@ -133,7 +133,7 @@
                                 Command="{Binding PrintResultsCommand}"
                                 IsEnabled="{Binding CanPrintResults}"
                                 Classes="command-secondary"
-                                Height="46"
+                                Height="42"
                                 HorizontalAlignment="Stretch"
                                 ToolTip.Tip="打印本次成功合并的 PDF 和需单独打印的 PDF">
                             <StackPanel Orientation="Horizontal" Spacing="8">

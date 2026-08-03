@@ -25,21 +25,21 @@
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel MaxWidth="1380"
-                        Margin="32,28,32,40"
+                        Margin="24,20,24,28"
                         HorizontalAlignment="Stretch"
-                        Spacing="16">
+                        Spacing="12">
                 <Border Background="{StaticResource BrushHeader}"
-                        CornerRadius="10"
-                        Padding="26,22">
+                        CornerRadius="8"
+                        Padding="22,16">
                     <Grid ColumnDefinitions="*,Auto">
-                        <StackPanel Grid.Column="0" Spacing="6">
+                        <StackPanel Grid.Column="0" Spacing="4">
                             <TextBlock Text="PDF 批量生产流程"
-                                       FontSize="23"
+                                       FontSize="21"
                                        FontWeight="SemiBold"
                                        Foreground="White" />
                             <TextBlock Text="按顺序完成目录配置、文件合并、结果核对与打印提交。"
                                        FontSize="12.5"
-                                       Foreground="#B7C2D2"
+                                       Foreground="#D0D8E4"
                                        TextWrapping="Wrap" />
                         </StackPanel>
 
@@ -48,12 +48,12 @@
                                 BorderBrush="#486FD9"
                                 BorderThickness="1"
                                 CornerRadius="7"
-                                Padding="13,9"
+                                Padding="12,7"
                                 VerticalAlignment="Center">
                             <TextBlock Text="合并结果确认后才会提交打印"
                                        FontSize="11.5"
                                        FontWeight="Medium"
-                                       Foreground="#DCE6FF" />
+                                       Foreground="#F0F4FF" />
                         </Border>
                     </Grid>
                 </Border>

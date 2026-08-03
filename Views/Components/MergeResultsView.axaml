@@ -7,11 +7,11 @@
     <Border Classes="workspace-card" Padding="0" Height="520">
         <Grid RowDefinitions="Auto,*">
             <Border Grid.Row="0"
-                    Padding="24,20"
+                    Padding="20,15"
                     BorderBrush="{StaticResource BrushLine}"
                     BorderThickness="0,0,0,1">
                 <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Grid.Column="0" Spacing="4">
+                    <StackPanel Grid.Column="0" Spacing="3">
                         <TextBlock Text="03  核对结果" Classes="section-kicker" />
                         <TextBlock Text="PDF 处理清单" Classes="section-title" />
                         <TextBlock Text="{Binding MergeSummaryText}"
@@ -22,7 +22,7 @@
                             IsVisible="{Binding HasMergeResults}"
                             Background="{StaticResource BrushSuccessSoft}"
                             CornerRadius="6"
-                            Padding="12,7"
+                            Padding="10,6"
                             VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" Spacing="7">
                             <PathIcon Data="{StaticResource IconCheck}"
@@ -44,18 +44,18 @@
                 <StackPanel>
                     <Border IsVisible="{Binding HasNoMergeResults}"
                             Background="{StaticResource BrushSurfaceSubtle}"
-                            Padding="28,36"
+                            Padding="24,28"
                             CornerRadius="0,0,10,10">
-                        <Grid ColumnDefinitions="42,*" ColumnSpacing="14" HorizontalAlignment="Center">
+                        <Grid ColumnDefinitions="38,*" ColumnSpacing="12" HorizontalAlignment="Center">
                             <Border Grid.Column="0"
-                                    Width="42"
-                                    Height="42"
+                                    Width="38"
+                                    Height="38"
                                     CornerRadius="8"
                                     Background="{StaticResource BrushBrandSoft}">
                                 <PathIcon Data="{StaticResource IconMerge}"
                                           Foreground="{StaticResource BrushBrand}"
-                                          Width="18"
-                                          Height="18"
+                                          Width="16"
+                                          Height="16"
                                           HorizontalAlignment="Center"
                                           VerticalAlignment="Center" />
                             </Border>
@@ -73,10 +73,10 @@
 
                     <ItemsControl IsVisible="{Binding HasStandaloneResults}"
                                   ItemsSource="{Binding StandaloneResults}"
-                                  Margin="18,18,18,0">
+                                  Margin="14,14,14,0">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Spacing="10" />
+                        <StackPanel Spacing="8" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -85,22 +85,22 @@
                                 BorderBrush="#E7C56A"
                                 BorderThickness="1"
                                 CornerRadius="8"
-                                Padding="16,13">
-                            <Grid ColumnDefinitions="42,*" ColumnSpacing="13">
+                                Padding="14,11">
+                            <Grid ColumnDefinitions="36,*" ColumnSpacing="11">
                                 <Border Grid.Column="0"
-                                        Width="42"
-                                        Height="42"
+                                        Width="36"
+                                        Height="36"
                                         CornerRadius="7"
                                         Background="#22A26B00"
                                         VerticalAlignment="Top">
                                     <PathIcon Data="{StaticResource IconFile}"
                                               Foreground="{StaticResource BrushWarning}"
-                                              Width="18"
-                                              Height="18"
+                                              Width="16"
+                                              Height="16"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
                                 </Border>
-                                <StackPanel Grid.Column="1" Spacing="5">
+                                <StackPanel Grid.Column="1" Spacing="4">
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                         <TextBlock Text="单独 A4 成页"
                                                    FontSize="10.5"
@@ -145,10 +145,10 @@
 
                     <ItemsControl IsVisible="{Binding HasPairResults}"
                                   ItemsSource="{Binding MergeResults}"
-                                  Margin="18">
+                                  Margin="14">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Spacing="10" />
+                        <StackPanel Spacing="8" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -168,9 +168,9 @@
                                         CornerRadius="8,0,0,8" />
 
                                 <Grid Grid.Column="1"
-                                      Margin="17,14"
+                                      Margin="14,11"
                                       RowDefinitions="Auto,Auto,Auto"
-                                      RowSpacing="11">
+                                      RowSpacing="8">
                                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
                                         <TextBlock Text="源文件配对"
                                                    FontSize="11"
@@ -181,7 +181,7 @@
                                                 IsVisible="{Binding IsSuccess}"
                                                 Background="{StaticResource BrushSuccessSoft}"
                                                 CornerRadius="5"
-                                                Padding="9,4">
+                                                Padding="8,3">
                                             <TextBlock Text="{Binding StatusText}"
                                                        FontSize="10.5"
                                                        FontWeight="SemiBold"
@@ -191,7 +191,7 @@
                                                 IsVisible="{Binding !IsSuccess}"
                                                 Background="{StaticResource BrushDangerSoft}"
                                                 CornerRadius="5"
-                                                Padding="9,4">
+                                                Padding="8,3">
                                             <TextBlock Text="{Binding StatusText}"
                                                        FontSize="10.5"
                                                        FontWeight="SemiBold"
@@ -199,13 +199,13 @@
                                         </Border>
                                     </Grid>
 
-                                    <Grid Grid.Row="1" ColumnDefinitions="*,34,*" ColumnSpacing="10">
+                                    <Grid Grid.Row="1" ColumnDefinitions="*,28,*" ColumnSpacing="8">
                                         <Border Grid.Column="0"
                                                 Background="{StaticResource BrushSurface}"
                                                 BorderBrush="{StaticResource BrushLine}"
                                                 BorderThickness="1"
                                                 CornerRadius="6"
-                                                Padding="12,9">
+                                                Padding="10,7">
                                             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
                                                 <PathIcon Grid.Column="0"
                                                           Data="{StaticResource IconFile}"
@@ -240,7 +240,7 @@
                                                 BorderBrush="{StaticResource BrushLine}"
                                                 BorderThickness="1"
                                                 CornerRadius="6"
-                                                Padding="12,9">
+                                                Padding="10,7">
                                             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
                                                 <PathIcon Grid.Column="0"
                                                           Data="{StaticResource IconFile}"
@@ -269,7 +269,7 @@
                                             BorderBrush="{StaticResource BrushLine}"
                                             BorderThickness="1"
                                             CornerRadius="6"
-                                            Padding="12,9">
+                                            Padding="10,7">
                                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                                             <TextBlock Grid.Column="0"
                                                        Text="→"

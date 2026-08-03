@@ -4,26 +4,26 @@
              RequestedThemeVariant="Light">
     <Application.Resources>
         <!-- PDF 生产工作台色板 -->
-        <SolidColorBrush x:Key="BrushCanvas">#F3F5F7</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushCanvas">#E9EEF3</SolidColorBrush>
         <SolidColorBrush x:Key="BrushSurface">#FFFFFF</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushSurfaceSubtle">#F7F9FB</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushHeader">#162033</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushHeaderRaised">#202C42</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushInk">#17212B</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushInkSecondary">#536170</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushInkMuted">#7C8895</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushLine">#DCE2E8</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushLineStrong">#B9C3CD</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushBrand">#2457D6</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushBrandHover">#1948BF</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushBrandSoft">#E8EEFF</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushOnBrandSoft">#173B91</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushSuccess">#18794E</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushSuccessSoft">#E3F3EA</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushDanger">#B42318</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushDangerSoft">#FDE8E7</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushWarning">#9A6700</SolidColorBrush>
-        <SolidColorBrush x:Key="BrushWarningSoft">#FFF4D6</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSurfaceSubtle">#F1F4F7</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushHeader">#101A2B</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushHeaderRaised">#1D2A40</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushInk">#101923</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushInkSecondary">#3D4C5B</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushInkMuted">#5E6D7C</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushLine">#C7D0DA</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushLineStrong">#94A3B3</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushBrand">#164FCB</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushBrandHover">#103FA9</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushBrandSoft">#DCE6FF</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushOnBrandSoft">#12367F</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSuccess">#116A43</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushSuccessSoft">#D8F0E3</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushDanger">#A51D14</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushDangerSoft">#F9DDDA</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushWarning">#805400</SolidColorBrush>
+        <SolidColorBrush x:Key="BrushWarningSoft">#FCEBC0</SolidColorBrush>
 
         <Geometry x:Key="IconFolder">M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z</Geometry>
         <Geometry x:Key="IconPrinter">M19,8H5C3.34,8 2,9.34 2,11V17H6V21H18V17H22V11C22,9.34 20.66,8 19,8M16,19H8V14H16V19M19,12C18.45,12 18,11.55 18,11C18,10.45 18.45,10 19,10C19.55,10 20,10.45 20,11C20,11.55 19.55,12 19,12M18,3H6V7H18V3Z</Geometry>
@@ -51,7 +51,7 @@
             <Setter Property="Background" Value="{StaticResource BrushSurface}" />
             <Setter Property="BorderBrush" Value="{StaticResource BrushLine}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="CornerRadius" Value="8" />
             <Setter Property="BoxShadow" Value="{StaticResource CardShadow}" />
         </Style>
 
@@ -62,7 +62,7 @@
         </Style>
 
         <Style Selector="TextBlock.section-title">
-            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontSize" Value="17" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Foreground" Value="{StaticResource BrushInk}" />
         </Style>
@@ -83,7 +83,7 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="7" />
-            <Setter Property="Padding" Value="20,11" />
+            <Setter Property="Padding" Value="18,9" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
@@ -97,7 +97,7 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="7" />
-            <Setter Property="Padding" Value="20,11" />
+            <Setter Property="Padding" Value="18,9" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
@@ -112,7 +112,7 @@
             <Setter Property="BorderBrush" Value="#2EB42318" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="7" />
-            <Setter Property="Padding" Value="14,9" />
+            <Setter Property="Padding" Value="13,8" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
@@ -123,7 +123,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource BrushLineStrong}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="Padding" Value="14,8" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
@@ -138,7 +138,7 @@
             <Setter Property="Foreground" Value="{StaticResource BrushInkSecondary}" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Padding" Value="10,7" />
+            <Setter Property="Padding" Value="9,6" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
 
@@ -173,7 +173,7 @@
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Foreground" Value="{StaticResource BrushInk}" />
             <Setter Property="FontSize" Value="13" />
-            <Setter Property="MinHeight" Value="44" />
+            <Setter Property="MinHeight" Value="40" />
         </Style>
 
         <Style Selector="ComboBox:focus-within">
