@@ -230,6 +230,35 @@ public sealed class ProcessingOrchestratorTests : IDisposable
     }
 
     [Fact]
+    public async Task MergeAsync_WhenPairNamesCollide_AssignsUniqueOutputNamesWithinBatch()
+    {
+        var source = CreateDirectory("colliding-names-source");
+        var output = CreateDirectory("colliding-names-output");
+        var highestPath = CreatePdf(source, "a_b.pdf");
+        var nextPath = CreatePdf(source, "a.pdf");
+        var secondShortestPath = CreatePdf(source, "b_c.pdf");
+        var shortestPath = CreatePdf(source, "c.pdf");
+        var orchestrator = CreateOrchestrator(
+            new Dictionary<string, PdfMetadata>
+            {
+                [highestPath] = Metadata(highestPath, 100, 400),
+                [nextPath] = Metadata(nextPath, 100, 300),
+                [secondShortestPath] = Metadata(secondShortestPath, 100, 200),
+                [shortestPath] = Metadata(shortestPath, 100, 100)
+            },
+            new FakePrintingService(),
+            new SuccessfulMergingService());
+
+        var result = await orchestrator.MergeAsync(source, output);
+
+        Assert.Equal(2, result.MergeSucceeded);
+        Assert.Equal(
+            ["a_b_c.pdf", "a_b_c_2.pdf"],
+            result.PairResults.Select(item => item.OutputFileName));
+        Assert.All(result.PairResults, item => Assert.True(File.Exists(item.OutputPath)));
+    }
+
+    [Fact]
     public async Task MergeAsync_WhenCountIsOdd_ReturnsTallestPdfAsStandalonePrintItem()
     {
         var source = CreateDirectory("odd-source");

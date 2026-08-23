@@ -97,13 +97,17 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         var pairResults = new List<MergeItemResult>(pairs.Count);
         var standaloneResults = new List<StandalonePdfResult>(standalonePlans.Count);
         var totalOutputs = pairs.Count + standalonePlans.Count;
+        var reservedOutputFileNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var pair in pairs)
         {
             ct.ThrowIfCancellationRequested();
             var firstFileName = Path.GetFileName(pair.FirstPdf.Path);
             var secondFileName = Path.GetFileName(pair.SecondPdf.Path);
-            var outputPath = Path.Combine(outputFolder, pair.OutputFileName);
+            var outputFileName = ReserveOutputFileName(
+                pair.OutputFileName,
+                reservedOutputFileNames);
+            var outputPath = Path.Combine(outputFolder, outputFileName);
             var temporaryPath = Path.Combine(outputFolder, $".{Guid.NewGuid():N}.tmp.pdf");
             try
             {
@@ -116,11 +120,11 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
                 {
                     var failureReason = GetFailureReason(mergeResult.ErrorMessage);
                     mergeFailed++;
-                    _logSink.Log($"合并失败: {pair.OutputFileName}；原因：{failureReason}");
+                    _logSink.Log($"合并失败: {outputFileName}；原因：{failureReason}");
                     pairResults.Add(new MergeItemResult(
                         firstFileName,
                         secondFileName,
-                        pair.OutputFileName,
+                        outputFileName,
                         outputPath,
                         false,
                         failureReason));
@@ -132,10 +136,10 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
                 pairResults.Add(new MergeItemResult(
                     firstFileName,
                     secondFileName,
-                    pair.OutputFileName,
+                    outputFileName,
                     outputPath,
                     true));
-                _logSink.Log($"合并成功: {firstFileName} + {secondFileName} -> {pair.OutputFileName}");
+                _logSink.Log($"合并成功: {firstFileName} + {secondFileName} -> {outputFileName}");
             }
             catch (OperationCanceledException)
             {
@@ -145,11 +149,11 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
             {
                 var failureReason = GetFailureReason(ex.Message);
                 mergeFailed++;
-                _logSink.Log($"处理失败: {pair.OutputFileName}；原因：{failureReason}");
+                _logSink.Log($"处理失败: {outputFileName}；原因：{failureReason}");
                 pairResults.Add(new MergeItemResult(
                     firstFileName,
                     secondFileName,
-                    pair.OutputFileName,
+                    outputFileName,
                     outputPath,
                     false,
                     failureReason));
@@ -166,7 +170,9 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
         {
             ct.ThrowIfCancellationRequested();
             var sourceFileName = Path.GetFileName(plan.Pdf.Path);
-            var outputFileName = $"single_{plan.Pdf.FileName}.pdf";
+            var outputFileName = ReserveOutputFileName(
+                $"single_{plan.Pdf.FileName}.pdf",
+                reservedOutputFileNames);
             var outputPath = Path.Combine(outputFolder, outputFileName);
             var temporaryPath = Path.Combine(outputFolder, $".{Guid.NewGuid():N}.tmp.pdf");
 
@@ -332,6 +338,23 @@ public class ProcessingOrchestrator : IProcessingOrchestrator
 
     private static void ReportProcessingProgress(IProgress<double>? progress, int processed, int total) =>
         progress?.Report(30 + (double)processed / total * 70);
+
+    private static string ReserveOutputFileName(
+        string preferredFileName,
+        ISet<string> reservedFileNames)
+    {
+        if (reservedFileNames.Add(preferredFileName))
+            return preferredFileName;
+
+        var name = Path.GetFileNameWithoutExtension(preferredFileName);
+        var extension = Path.GetExtension(preferredFileName);
+        for (var suffix = 2; ; suffix++)
+        {
+            var candidate = $"{name}_{suffix}{extension}";
+            if (reservedFileNames.Add(candidate))
+                return candidate;
+        }
+    }
 
     private static string GetFailureReason(string? errorMessage) =>
         string.IsNullOrWhiteSpace(errorMessage) ? "服务未提供详细原因" : errorMessage;

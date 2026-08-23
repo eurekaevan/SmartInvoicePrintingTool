@@ -15,7 +15,8 @@
                         <TextBlock Text="03  核对结果" Classes="section-kicker" />
                         <TextBlock Text="PDF 处理清单" Classes="section-title" />
                         <TextBlock Text="{Binding MergeSummaryText}"
-                                   Classes="body-muted" />
+                                   Classes="body-muted"
+                                   TextWrapping="Wrap" />
                     </StackPanel>
 
                     <Border Grid.Column="1"

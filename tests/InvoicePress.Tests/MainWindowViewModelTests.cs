@@ -54,6 +54,9 @@ public sealed class MainWindowViewModelTests : IDisposable
 
         Assert.Equal([mergedPath, standalonePath], orchestrator.PrintedPaths);
         Assert.Equal(2, viewModel.PrintableFileCount);
+        Assert.Equal(
+            "配对 1 组（成功 1、失败 0），单独成页 1 份（成功 1、失败 0）",
+            viewModel.MergeSummaryText);
     }
 
     public void Dispose()

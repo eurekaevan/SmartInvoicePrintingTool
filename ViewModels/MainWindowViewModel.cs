@@ -43,10 +43,13 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     public bool HasNoMergeResults => !HasMergeResults;
     public int SuccessfulMergeCount => MergeResults.Count(item => item.IsSuccess);
     public int SuccessfulStandaloneCount => StandaloneResults.Count(item => item.IsSuccess);
+    public int FailedMergeCount => MergeResults.Count - SuccessfulMergeCount;
+    public int FailedStandaloneCount => StandaloneResults.Count - SuccessfulStandaloneCount;
     public int PrintableFileCount => SuccessfulMergeCount + SuccessfulStandaloneCount;
     public string MergeSummaryText => HasMergeResults
-        ? $"本次 {MergeResults.Count} 组配对，成功 {SuccessfulMergeCount} 组，"
-            + $"{StandaloneResults.Count} 份单独成页"
+        ? $"配对 {MergeResults.Count} 组（成功 {SuccessfulMergeCount}、失败 {FailedMergeCount}），"
+            + $"单独成页 {StandaloneResults.Count} 份"
+            + $"（成功 {SuccessfulStandaloneCount}、失败 {FailedStandaloneCount}）"
         : "合并完成后将在这里显示文件配对";
     public bool CanPrintResults =>
         !IsBusy && PrintableFileCount > 0 && !string.IsNullOrWhiteSpace(SelectedPrinter);
@@ -318,6 +321,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(HasPairResults));
         OnPropertyChanged(nameof(SuccessfulMergeCount));
         OnPropertyChanged(nameof(SuccessfulStandaloneCount));
+        OnPropertyChanged(nameof(FailedMergeCount));
+        OnPropertyChanged(nameof(FailedStandaloneCount));
         OnPropertyChanged(nameof(PrintableFileCount));
         OnPropertyChanged(nameof(MergeSummaryText));
         OnPropertyChanged(nameof(CanPrintResults));
